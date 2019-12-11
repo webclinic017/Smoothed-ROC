@@ -28,7 +28,7 @@ def minutes_of_new_data(symbol, kline_size, data, source):
     return old, new
 
 def get_all_binance(symbol, kline_size, save = False):
-    filename = f'{symbol}-{kline_size}-data.csv'
+    filename = f'Data\\{symbol}-{kline_size}-data.csv'
     if os.path.isfile(filename):
         data_df = pd.read_csv(filename)
     else:
@@ -36,8 +36,10 @@ def get_all_binance(symbol, kline_size, save = False):
     oldest_point, newest_point = minutes_of_new_data(symbol, kline_size, data_df, source="binance")
     delta_min = (newest_point - oldest_point).total_seconds()/60
     available_data = math.ceil(delta_min/binsizes[kline_size])
-    if oldest_point == datetime.strptime('1 Jan 2017', '%d %b %Y'): print(f'Downloading all available {kline_size} data for {symbol}. Be patient..!')
-    else: print(f'Downloading {delta_min} minutes of new data available for {symbol}, i.e. {available_data} instances of {kline_size} data.')
+    if oldest_point == datetime.strptime('1 Jan 2017', '%d %b %Y'):
+        print(f'Downloading all available {kline_size} data for {symbol}, {int(delta_min)} minutes of data. Be patient..!')
+    else:
+        print(f'Downloading {delta_min} minutes of new data available for {symbol}, i.e. {available_data} instances of {kline_size} data.')
     klines = binance_client.get_historical_klines(symbol, kline_size, oldest_point.strftime("%d %b %Y %H:%M:%S"), newest_point.strftime("%d %b %Y %H:%M:%S"))
     data = pd.DataFrame(klines, columns = ['timestamp', 'open', 'high', 'low', 'close', 'volume', 'close_time', 'quote_av', 'trades', 'tb_base_av', 'tb_quote_av', 'ignore' ])
     data['timestamp'] = pd.to_datetime(data['timestamp'], unit='ms')
@@ -57,14 +59,13 @@ pairs = list(screener_data['Ticker'])
 
 print('pairs list: ', pairs)
 
-for i in range(6):
-    get_all_binance(pairs[i], '1m', save=True)
-    print(f'{pairs[i]} downloaded')
-
-
-
 ### RUN
-#symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT']
-#for symbol in symbols:
+
+# symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT']
+# for symbol in symbols:
 #    get_all_binance(symbol, '1m', save=True)
-#    print(f'{symbol} downloaded')
+
+#for i in range(20):
+#    get_all_binance(pairs[i], '1m', save=True)
+
+get_all_binance('ZILUSDT', '1m', save=True)
