@@ -11,4 +11,4 @@ BTC = pd.DataFrame(klines, columns=['Open Time', 'Open', 'High', 'Low', 'Close',
 BTC['Open Time'] = pd.to_datetime(BTC['Open Time'], unit='ms')
 BTC.set_index('Open Time', inplace=True)
 
-BTC.to_csv('BTC_1m_'+str(datetime.datetime.now().strftime("%Y_%m_%d")), date_format='%Y-%m-%d %H:%M:%S')
+BTC.to_csv('BTC_1m_'+str(datetime.datetime.now().strftime("%Y_%m_%d")) + '.csv', date_format='%Y-%m-%d %H:%M:%S')
