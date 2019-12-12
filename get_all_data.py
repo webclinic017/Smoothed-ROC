@@ -42,13 +42,17 @@ def get_all_binance(symbol, kline_size, save = False):
         print(f'Downloading {delta_min} minutes of new data available for {symbol}, i.e. {available_data} instances of {kline_size} data.')
     klines = binance_client.get_historical_klines(symbol, kline_size, oldest_point.strftime("%d %b %Y %H:%M:%S"), newest_point.strftime("%d %b %Y %H:%M:%S"))
     data = pd.DataFrame(klines, columns = ['timestamp', 'open', 'high', 'low', 'close', 'volume', 'close_time', 'quote_av', 'trades', 'tb_base_av', 'tb_quote_av', 'ignore' ])
-    data['timestamp'] = pd.to_datetime(data['timestamp'], unit='ms')
+    data['timestamp'] = pd.to_datetime(data['timestamp'], format='%Y-%m-%d %H:%M:%S', unit='ms')
     if len(data_df) > 0:
         temp_df = pd.DataFrame(data)
         data_df = data_df.append(temp_df)
     else: data_df = data
+    #TODO insert some code to truncate datetimes to proper length, maybe use strftime and then strptime
+    # to simply convert to a string of desired precision and then convert straight back to datetime format
+    print(data_df['timestamp'].iloc[40500])
     data_df.set_index('timestamp', inplace=True)
-    if save: data_df.to_csv(filename)
+    if save:
+        data_df.to_csv(filename, date_format='%Y-%m-%d %H:%M:%S')
     print('All caught up..!')
     return data_df
 
@@ -65,7 +69,7 @@ print('pairs list: ', pairs)
 # for symbol in symbols:
 #    get_all_binance(symbol, '1m', save=True)
 
-#for i in range(20):
-#    get_all_binance(pairs[i], '1m', save=True)
+for i in range(len(pairs)):
+    get_all_binance(pairs[i], '1m', save=True)
 
-get_all_binance('ZILUSDT', '1m', save=True)
+# get_all_binance('BNBUSDT', '1m', save=True)

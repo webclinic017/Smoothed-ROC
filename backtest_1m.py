@@ -37,9 +37,9 @@ class PercentSizer(bt.Sizer):
 class SmoothedROC(bt.Strategy):
 
     params = (
-        ('roc_period', 18000),
-        ('sroc_period', 6000),
-        ('lookback', 12000),
+        ('roc_period', 1800),
+        ('sroc_period', 600),
+        ('lookback', 1200),
         ('debug', True),
         )
 
@@ -142,10 +142,11 @@ class SmoothedROC(bt.Strategy):
 if __name__ == '__main__':
 
     startcash = 1000
+    trading_pair = 'BTCUSDT'
 
     cerebro = bt.Cerebro()
     cerebro.addstrategy(SmoothedROC)
-    datapath = os.path.abspath(os.getcwd() + '/BTC_1m_' + str(datetime.datetime.now().strftime("%Y_%m_%d")))
+    datapath = os.path.abspath(os.getcwd() + f'\Data\{trading_pair}-1m-data.csv')
 
     # Create a data feed
     data = btfeeds.GenericCSVData(

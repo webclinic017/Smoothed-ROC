@@ -148,15 +148,16 @@ class SmoothedROC(bt.Strategy):
 if __name__ == '__main__':
 
     startcash = 1000
+    trading_pair = 'BNBUSDT'
 
     cerebro = bt.Cerebro(stdstats=False,optreturn=True,optdatas=True)
     cerebro.optstrategy(SmoothedROC, roc_period=range(10, 1000, 50), sroc_period=range(10, 500, 25), lookback=range(10, 1000, 50))
-    datapath = os.path.abspath(os.getcwd() + '/BTC_1m_' + str(datetime.datetime.now().strftime("%Y_%m_%d")))
+    datapath = os.path.abspath(os.getcwd() + f'\Data\{trading_pair}-1m-data.csv')
 
     # Create a data feed
     data = btfeeds.GenericCSVData(
         dataname=datapath,
-        fromdate=datetime.datetime(2019, 6, 1),
+        fromdate=datetime.datetime(2017, 1, 1),
         dtformat=('%Y-%m-%d %H:%M:%S'),
         datetime=0,
         high=2,
@@ -183,10 +184,10 @@ if __name__ == '__main__':
     opt_runs = cerebro.run()
 
     # initialise or load an array for stats
-    if not os.path.exists('sqn_1m.npy'):
+    if not os.path.exists(f'{trading_pair}_sqn_1m.npy'):
         sqn_array = np.zeros((100, 50, 100))
     else:
-        sqn_array = np.load('sqn_1m.npy')
+        sqn_array = np.load(f'{trading_pair}_sqn_1m.npy')
 
     for run in opt_runs:
         for strategy in run:
@@ -199,7 +200,7 @@ if __name__ == '__main__':
             sqn_array[period1][period2][period3] = sqn_value
 
     # save the array for future recall
-    np.save('sqn_1m.npy', sqn_array)
+    np.save(f'{trading_pair}_sqn_1m.npy', sqn_array)
 
     # find index of result with highest score
     ind_max = np.unravel_index(np.argmax(sqn_array, axis=None), sqn_array.shape)
