@@ -54,11 +54,6 @@ def get_all_binance(symbol, kline_size, save = False):
     return data_df
 
 
-screener_data = pd.read_csv('crypto_2019-12-10.csv')
-
-pairs = list(screener_data['Ticker'])
-
-print('pairs list: ', pairs)
 
 ### RUN
 
@@ -66,6 +61,9 @@ print('pairs list: ', pairs)
 # for symbol in symbols:
 #    get_all_binance(symbol, '1m', save=True)
 
+# screener_data = pd.read_csv('crypto_2019-12-10.csv')
+# pairs = list(screener_data['Ticker'])
+# print('pairs list: ', pairs)
 # for i in range(len(pairs)):
 #     get_all_binance(pairs[i], '1m', save=True)
 
