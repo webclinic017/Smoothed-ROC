@@ -1,13 +1,9 @@
 import numpy as np
 
-a = np.random.rand(3, 3)
-a = a - a[1][1]
-print(a)
-x, y = a.nonzero()
-print(x)
-print(y)
+def stats(trading_pair):
+    a = np.load(f'\results\{trading_pair}_sqn_1m.npy')
 
-b = a[x][y] + 10
-a = b - 10
+    max = np.amax(a[a != 0])
+    ind_max = np.argwhere(a == max)
 
-print(a)
+    print(f'Best SQN score: {max:.1f}, settings: {ind_max}')

@@ -199,20 +199,18 @@ if __name__ == '__main__':
             # .get_analysis() returns a dict so use dictionary .get method to retrieve sqn score
             sqn_value = sqn_result.get('sqn')
             # store all sqn scores from backtests in a numpy array and add 20 to each so the 0 values don't interfere
-            sqn_array[period1][period2][period3] = sqn_value + 20
+            sqn_array[period1][period2][period3] = sqn_value
 
     # find index of result with highest score
-    ind_max = np.unravel_index(np.argmax(sqn_array, axis=None), sqn_array.shape)
+    max = np.amax(a[a != 0]) # if all values are below zero, this will ignore the zeros
+    ind_max = np.argwhere(a == max)
 
     t_end = time.perf_counter()
     total_time = t_end - t_start
-
-    # remove the 20 added earlier to restore true sqn scores
-    sqn_adjusted = sqn_array - 20
 
     # save the array for future recall
     np.save(f'{trading_pair}_sqn_1m.npy', sqn_adjusted)
 
     print('Backtest took:{}h {}m'.format(int(total_time/3600), int(total_time/60)%60))
     print('Best Settings: {}'.format(ind_max))
-    print('SQN Score: {:.1f}'.format(sqn_array[ind_max]))
+    print('SQN Score: {:.1f}'.format(max)
