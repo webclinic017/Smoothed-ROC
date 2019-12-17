@@ -1,5 +1,6 @@
 import datetime
 import backtrader as bt
+import time
 
 
 class SmoothedROC(bt.Strategy):
@@ -106,3 +107,8 @@ class SmoothedROC(bt.Strategy):
             #print('8: Volume:                               {}'.format(data.volume[0]))
             print('9: Position Size:                        {}'.format(self.position.size))
             print('--------------------------------------------------------------------')
+
+    # def stop(self):
+    #     t_elapsed = time.perf_counter()
+    #     elapsed = t_elapsed - t_start
+    #     print('Time elapsed:{}h {}m'.format(int(elapsed/3600), int(elapsed/60)%60))

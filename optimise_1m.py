@@ -149,7 +149,7 @@ class PercentSizer(bt.Sizer):
 if __name__ == '__main__':
 
     startcash = 1000
-    trading_pair = 'BNBUSDT'
+    trading_pair = 'BTCUSDT'
 
     cerebro = bt.Cerebro(stdstats=False,optreturn=True,optdatas=True)
     cerebro.optstrategy(SmoothedROC, roc_period=range(10, 1000, 50), sroc_period=range(10, 500, 25), lookback=range(10, 1000, 50))
@@ -158,7 +158,7 @@ if __name__ == '__main__':
     # Create a data feed
     data = btfeeds.GenericCSVData(
         dataname=datapath,
-        fromdate=datetime.datetime(2017, 1, 1),
+        fromdate=datetime.datetime(2019, 1, 1),
         dtformat=('%Y-%m-%d %H:%M:%S'),
         datetime=0,
         high=2,
