@@ -4,11 +4,10 @@
 import pandas as pd
 import math
 import os.path
-import time
+# import time
 from binance.client import Client
 from datetime import timedelta, datetime
 from dateutil import parser
-from tqdm import tqdm_notebook #(Optional, used for progress-bars)
 import keys
 
 ### CONSTANTS
@@ -61,10 +60,10 @@ def get_all_binance(symbol, kline_size, save = False):
 # for symbol in symbols:
 #    get_all_binance(symbol, '1m', save=True)
 
-screener_data = pd.read_csv('crypto_2019-12-12.csv')
-pairs = list(screener_data['Ticker'])
-print('pairs list: ', pairs)
-for i in range(len(pairs)):
-    get_all_binance(pairs[i], '1m', save=True)
+# screener_data = pd.read_csv('crypto_2019-12-12.csv')
+# pairs = list(screener_data['Ticker'])
+# print('pairs list: ', pairs)
+# for i in range(len(pairs)):
+#     get_all_binance(pairs[i], '1m', save=True)
 
-# get_all_binance('BEAMUSDT', '1m', save=True)
+get_all_binance('BEAMUSDT', '1m', save=True)

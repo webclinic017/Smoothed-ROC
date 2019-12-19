@@ -5,6 +5,7 @@ import datetime
 import time
 import numpy as np
 from strategies import SmoothedROC
+import math
 
 t_start = time.perf_counter()
 
@@ -149,7 +150,28 @@ class PercentSizer(bt.Sizer):
 if __name__ == '__main__':
 
     startcash = 1000
-    trading_pair = 'ETHUSDT'
+    trading_pair = 'BEAMUSDT'
+
+    ############### results function ####################
+
+    # array_x = 100
+    # array_y = 50
+    # array_z = 100
+    #
+    # results_range_min_x = 1
+    # results_range_max_x = 1000
+    # results_range_min_y = 5
+    # results_range_max_y = 500
+    # results_range_min_z = 1
+    # results_range_max_z = 1000
+    #
+    # results_amount_x = 20
+    # results_amount_y = 20
+    # results_amount_z = 20
+
+    # step_size_x = math.ceil((results_range_max_x - results_range_min_x), results_amount_x
+
+    ############### results function ####################
 
     cerebro = bt.Cerebro(stdstats=False,optreturn=True,optdatas=True)
     cerebro.optstrategy(SmoothedROC, roc_period=range(10, 1000, 50), sroc_period=range(10, 500, 25), lookback=range(10, 1000, 50))
@@ -158,7 +180,7 @@ if __name__ == '__main__':
     # Create a data feed
     data = btfeeds.GenericCSVData(
         dataname=datapath,
-        fromdate=datetime.datetime(2019, 1, 1),
+        fromdate=datetime.datetime(2019, 12, 11),
         dtformat=('%Y-%m-%d %H:%M:%S'),
         datetime=0,
         high=2,
@@ -198,7 +220,7 @@ if __name__ == '__main__':
             sqn_result = strategy.analyzers.sqn.get_analysis()
             # .get_analysis() returns a dict so use dictionary .get method to retrieve sqn score
             sqn_value = sqn_result.get('sqn')
-            # store all sqn scores from backtests in a numpy array and add 20 to each so the 0 values don't interfere
+            # store all sqn scores from backtests in a numpy array
             sqn_array[period1][period2][period3] = sqn_value
 
     # find index of result with highest score
@@ -209,8 +231,8 @@ if __name__ == '__main__':
     total_time = t_end - t_start
 
     # save the array for future recall
-    np.save(f'results\{trading_pair}_sqn_1m.npy', sqn_adjusted)
+    np.save(f'results\{trading_pair}_sqn_1m.npy', sqn_array)
 
     print('Backtest took:{}h {}m'.format(int(total_time/3600), int(total_time/60)%60))
-    print('Best Settings: {}'.format(ind_max))
+    print('Best Settings: {}'.format(ind_max * 10))
     print('SQN Score: {:.1f}'.format(max))
