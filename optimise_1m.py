@@ -149,7 +149,7 @@ class PercentSizer(bt.Sizer):
 if __name__ == '__main__':
 
     startcash = 1000
-    trading_pair = 'BTCUSDT'
+    trading_pair = 'ETHUSDT'
 
     cerebro = bt.Cerebro(stdstats=False,optreturn=True,optdatas=True)
     cerebro.optstrategy(SmoothedROC, roc_period=range(10, 1000, 50), sroc_period=range(10, 500, 25), lookback=range(10, 1000, 50))
@@ -188,7 +188,7 @@ if __name__ == '__main__':
     if not os.path.exists(f'{trading_pair}_sqn_1m.npy'):
         sqn_array = np.zeros((100, 50, 100))
     else:
-        sqn_array = np.load(f'{trading_pair}_sqn_1m.npy')
+        sqn_array = np.load(f'results\{trading_pair}_sqn_1m.npy')
 
     for run in opt_runs:
         for strategy in run:
@@ -202,15 +202,15 @@ if __name__ == '__main__':
             sqn_array[period1][period2][period3] = sqn_value
 
     # find index of result with highest score
-    max = np.amax(a[a != 0]) # if all values are below zero, this will ignore the zeros
-    ind_max = np.argwhere(a == max)
+    max = np.amax(sqn_array[sqn_array != 0]) # if all values are below zero, this will ignore the zeros
+    ind_max = np.argwhere(sqn_array == max)
 
     t_end = time.perf_counter()
     total_time = t_end - t_start
 
     # save the array for future recall
-    np.save(f'{trading_pair}_sqn_1m.npy', sqn_adjusted)
+    np.save(f'results\{trading_pair}_sqn_1m.npy', sqn_adjusted)
 
     print('Backtest took:{}h {}m'.format(int(total_time/3600), int(total_time/60)%60))
     print('Best Settings: {}'.format(ind_max))
-    print('SQN Score: {:.1f}'.format(max)
+    print('SQN Score: {:.1f}'.format(max))
