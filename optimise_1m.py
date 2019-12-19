@@ -175,9 +175,13 @@ if __name__ == '__main__':
 
     cerebro.broker.setcash(startcash)
 
+    # TODO To make t_start available inside the strategy, i think i have to write a method within the strategy class which sets a variable inside that namespace
+    # i can then call the method from this script and pass t_start from here into the strategy class
+
     cerebro.addsizer(PercentSizer)
 
     #cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name='ta')
+    # TODO work out what tradeanalyzer does and if it would be useful for stats
     cerebro.addanalyzer(bt.analyzers.SQN, _name='sqn')
 
     cerebro.broker.setcommission(commission=0.0075)
@@ -209,7 +213,7 @@ if __name__ == '__main__':
     total_time = t_end - t_start
 
     # save the array for future recall
-    np.save(f'results\{trading_pair}_sqn_1m.npy', sqn_adjusted)
+    np.save(f'results\{trading_pair}_sqn_1m.npy', sqn_array)
 
     print('Backtest took:{}h {}m'.format(int(total_time/3600), int(total_time/60)%60))
     print('Best Settings: {}'.format(ind_max))
