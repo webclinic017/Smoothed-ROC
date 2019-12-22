@@ -149,10 +149,10 @@ class PercentSizer(bt.Sizer):
 if __name__ == '__main__':
 
     startcash = 1000
-    trading_pair = 'ETHUSDT'
+    trading_pair = 'BNBUSDT'
 
     cerebro = bt.Cerebro(stdstats=False,optreturn=True,optdatas=True)
-    cerebro.optstrategy(SmoothedROC, roc_period=range(10, 1000, 50), sroc_period=range(10, 500, 25), lookback=range(10, 1000, 50))
+    cerebro.optstrategy(SmoothedROC, roc_period=range(10, 1000, 50), sroc_period=range(10, 500, 25), lookback=range(10, 1000, 50), start=t_start)
     datapath = os.path.abspath(os.getcwd() + f'\Data\{trading_pair}-1m-data.csv')
 
     # Create a data feed
