@@ -10,6 +10,7 @@ class SmoothedROC(bt.Strategy):
         ('sroc_period', 600),
         ('lookback', 1200),
         ('debug', False),
+        ('start', 0),
         )
 
     def log(self, txt, dt=None):
@@ -108,10 +109,11 @@ class SmoothedROC(bt.Strategy):
             print('9: Position Size:                        {}'.format(self.position.size))
             print('--------------------------------------------------------------------')
 
-    # def stop(self):
-    #     t_elapsed = time.perf_counter()
-    #     elapsed = t_elapsed - t_start
-    #     print('Time elapsed:{}h {}m'.format(int(elapsed/3600), int(elapsed/60)%60))
+    def stop(self):
+        t_elapsed = time.perf_counter()
+        elapsed = t_elapsed - self.params.start
+        if len(datas.data) == 1:
+            print('Time elapsed:{}h {}m'.format(int(elapsed/3600), int(elapsed/60)%60))
 
 class SmoothedRocStops(bt.Strategy):
 

@@ -174,13 +174,13 @@ if __name__ == '__main__':
     ############### results function ####################
 
     cerebro = bt.Cerebro(stdstats=False,optreturn=True,optdatas=True)
-    cerebro.optstrategy(SmoothedROC, roc_period=range(10, 1000, 50), sroc_period=range(10, 500, 25), lookback=range(10, 1000, 50))
+    cerebro.optstrategy(SmoothedROC, roc_period=range(10, 1000, 50), sroc_period=range(10, 500, 25), lookback=range(10, 1000, 50), start=t_start)
     datapath = os.path.abspath(os.getcwd() + f'\Data\{trading_pair}-1m-data.csv')
 
     # Create a data feed
     data = btfeeds.GenericCSVData(
         dataname=datapath,
-        fromdate=datetime.datetime(2019, 12, 11),
+        fromdate=datetime.datetime(2019, 1, 1),
         dtformat=('%Y-%m-%d %H:%M:%S'),
         datetime=0,
         high=2,
@@ -200,6 +200,7 @@ if __name__ == '__main__':
     cerebro.addsizer(PercentSizer)
 
     #cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name='ta')
+    # TODO work out what tradeanalyzer does and if it would be useful for stats
     cerebro.addanalyzer(bt.analyzers.SQN, _name='sqn')
 
     cerebro.broker.setcommission(commission=0.0075)
