@@ -1,12 +1,12 @@
 import numpy as np
 
-pair = 'BTCUSDT'
-sqn = np.load(f'{pair}_sqn_1m.npy')
+pair = 'BNBUSDT'
+sqn = np.load(f'results\{pair}_sqn_1m.npy')
 
 # find index of result with highest score
-max = np.amax(a[a != 0])
-ind_max = np.argwhere(a == max)
-print('Best Settings: {}'.format(ind_max))
+max = np.amax(sqn[sqn != 0])
+ind_max = np.argwhere(sqn == max)
+print('Best Settings: {}'.format(ind_max*10))
 print('SQN Score: {:.1f}'.format(max))
 
 

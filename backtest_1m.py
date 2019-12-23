@@ -6,6 +6,7 @@ import time
 import math
 import matplotlib
 from strategies import SmoothedROC
+from strategies import SmoothedRocStops
 
 t_start = time.perf_counter()
 
@@ -143,16 +144,16 @@ class PercentSizer(bt.Sizer):
 if __name__ == '__main__':
 
     startcash = 1000
-    trading_pair = 'BTCUSDT'
+    trading_pair = 'BNBUSDT'
 
     cerebro = bt.Cerebro()
-    cerebro.addstrategy(SmoothedROC)
+    cerebro.addstrategy(SmoothedRocStops, start=t_start)
     datapath = os.path.abspath(os.getcwd() + f'\Data\{trading_pair}-1m-data.csv')
 
     # Create a data feed
     data = btfeeds.GenericCSVData(
         dataname=datapath,
-        fromdate=datetime.datetime(2017, 1, 1),
+        fromdate=datetime.datetime(2019, 1, 1),
         dtformat=('%Y-%m-%d %H:%M:%S'),
         datetime=0,
         high=2,

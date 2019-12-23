@@ -6,9 +6,9 @@ import time
 class SmoothedROC(bt.Strategy):
 
     params = (
-        ('roc_period', 1800),
-        ('sroc_period', 600),
-        ('lookback', 1200),
+        ('roc_period', 760),
+        ('sroc_period', 480),
+        ('lookback', 960),
         ('debug', False),
         ('start', 0),
         )
@@ -112,17 +112,18 @@ class SmoothedROC(bt.Strategy):
     def stop(self):
         t_elapsed = time.perf_counter()
         elapsed = t_elapsed - self.params.start
-        if len(datas.data) == 1:
+        if len(self.data) == 1:
             print('Time elapsed:{}h {}m'.format(int(elapsed/3600), int(elapsed/60)%60))
 
 class SmoothedRocStops(bt.Strategy):
 
     params = (
-        ('roc_period', 1800),
-        ('sroc_period', 600),
-        ('lookback', 1200),
-        ('stop_sell_perc', 0.02),
-        ('stop_buy_perc', 0.02),
+        ('roc_period', 760),
+        ('sroc_period', 480),
+        ('lookback', 960),
+        ('stop_sell_perc', 20),
+        ('stop_buy_perc', 20),
+        ('start', 0),
         ('debug', False),
         )
 
@@ -189,13 +190,13 @@ class SmoothedRocStops(bt.Strategy):
 
                 self.log('BUY CREATE, %.2f' % self.dataclose[0])
                 self.order = self.buy()
-                # self.order = self.sell(size=1, exectype=bt.Order.StopTrail, trailpercent=self.p.stop_sell_perc)
+                self.order = self.sell(exectype=bt.Order.StopTrail, trailpercent=self.p.stop_sell_perc*0.001)
 
             elif self.sroc < self.sroc[-self.lookback]:
 
                 self.log('SELL CREATE, %.2f' % self.dataclose[0])
                 self.order = self.sell()
-                # self.order = self.buy(size=1, exectype=bt.Order.StopTrail, trailpercent=self.p.stop_buy_perc)
+                self.order = self.buy(exectype=bt.Order.StopTrail, trailpercent=self.p.stop_buy_perc*0.001)
 
         else:
 
@@ -204,14 +205,14 @@ class SmoothedRocStops(bt.Strategy):
                     self.log('BUY CREATE, %.2f' % self.dataclose[0])
                     self.order = self.close()
                     self.order = self.buy()
-                    # self.order = self.sell(size=1, exectype=bt.Order.StopTrail, trailpercent=self.p.stop_sell_perc)
+                    self.order = self.sell(exectype=bt.Order.StopTrail, trailpercent=self.p.stop_sell_perc*0.001)
 
             elif self.sroc < self.sroc[-self.lookback]:
                 if self.position.size > 0:
                     self.log('SELL CREATE, %.2f' % self.dataclose[0])
                     self.order = self.close()
                     self.order = self.sell()
-                    # self.order = self.buy(size=1, exectype=bt.Order.StopTrail, trailpercent=self.p.stop_buy_perc)
+                    self.order = self.buy(exectype=bt.Order.StopTrail, trailpercent=self.p.stop_buy_perc*0.001)
 # TODO implement stop loss logic for all buys and sells
 # TODO perhaps use atr for trailing stops
         if self.p.debug:
@@ -227,7 +228,8 @@ class SmoothedRocStops(bt.Strategy):
             print('9: Position Size:                        {}'.format(self.position.size))
             print('--------------------------------------------------------------------')
 
-    # def stop(self):
-    #     t_elapsed = time.perf_counter()
-    #     elapsed = t_elapsed - t_start
-    #     print('Time elapsed:{}h {}m'.format(int(elapsed/3600), int(elapsed/60)%60))
+    def stop(self):
+        t_elapsed = time.perf_counter()
+        elapsed = t_elapsed - self.params.start
+        if len(self.data) == 1:
+            print('Time elapsed:{}h {}m'.format(int(elapsed / 3600), int(elapsed / 60) % 60))
