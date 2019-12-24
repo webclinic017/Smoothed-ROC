@@ -40,7 +40,7 @@ class PercentSizer(bt.Sizer):
 if __name__ == '__main__':
 
     startcash = 1000
-    trading_pair = 'BEAMUSDT'
+    trading_pair = 'BNBUSDT'
     strategy_name = SmoothedRocStops
 
     ############### results function ####################
@@ -109,10 +109,10 @@ if __name__ == '__main__':
     b = SmoothedRocStops.params.stop_buy_perc
 
     # initialise or load an array for stats
-    if not os.path.exists(f'results_{strategy_name}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy'):
+    if not os.path.exists(f'results_{str(strategy_name)}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy'):
         sqn_array = np.zeros((41, 41))
     else:
-        sqn_array = np.load(f'results_{strategy_name}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy')
+        sqn_array = np.load(f'results_{str(strategy_name)}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy')
 
     for run in opt_runs:
         for strategy in run:
@@ -151,7 +151,7 @@ if __name__ == '__main__':
     total_time = t_end - t_start
 
     # save the array for future recall
-    np.save(f'results_{strategy_name}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy', sqn_array)
+    np.save(f'results_{str(strategy_name)}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy', sqn_array)
     # np.save(f'results_{strategy_name}\{trading_pair}_{a}-{b}_sqn_1m.npy', sqn_array)
 
     print('Backtest took:{}h {}m'.format(int(total_time/3600), int(total_time/60)%60))
