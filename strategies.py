@@ -121,8 +121,8 @@ class SmoothedRocStops(bt.Strategy):
         ('roc_period', 760),
         ('sroc_period', 480),
         ('lookback', 960),
-        ('stop_sell_perc', 20),
-        ('stop_buy_perc', 20),
+        ('stop_sell_perc', 50),
+        ('stop_buy_perc', 50),
         ('start', 0),
         ('debug', False),
         )
@@ -231,5 +231,9 @@ class SmoothedRocStops(bt.Strategy):
     def stop(self):
         t_elapsed = time.perf_counter()
         elapsed = t_elapsed - self.params.start
-        if len(self.data) == 1:
-            print('Time elapsed:{}h {}m'.format(int(elapsed / 3600), int(elapsed / 60) % 60))
+        hours = elapsed//3600
+        minutes = elapsed//60
+        global run_counter
+        # run_counter += 1
+        # print(f'Run number:{run_counter}')
+        print(f'Time elapsed:{hours}h {minutes%60}m')

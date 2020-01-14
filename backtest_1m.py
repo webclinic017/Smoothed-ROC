@@ -7,6 +7,7 @@ import math
 import matplotlib
 from strategies import SmoothedROC
 from strategies import SmoothedRocStops
+from analysis_functions import printTradeAnalysis
 
 t_start = time.perf_counter()
 
@@ -172,24 +173,26 @@ if __name__ == '__main__':
 
     cerebro.addsizer(PercentSizer)
 
-    #cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name='ta')
-    #cerebro.addanalyzer(bt.analyzers.SQN, _name='sqn')
+    cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name='ta')
+    cerebro.addanalyzer(bt.analyzers.SQN, _name='sqn')
 
     cerebro.broker.setcommission(commission=0.0075)
 
     print('Starting Balance: %.2f' % cerebro.broker.getvalue())
 
-    cerebro.run()
-
-    #sqn_result = cerebro.analyzers.sqn.get_analysis()
-    # .get_analysis() returns a dict so use dictionary .get method to retrieve sqn score
-    #sqn_value = sqn_result.get('sqn')
+    strategy_list = cerebro.run()   # this returns a list of strategy objects even if there is only 1 strat to return
+    first = strategy_list[0]        # so we just extract the first (and only) object from the list for anaylsis
 
     t_end = time.perf_counter()
     total_time = t_end - t_start
 
+    printTradeAnalysis(first.analyzers.ta.get_analysis())
+    sqn_result = first.analyzers.sqn.get_analysis()
+    # .get_analysis() returns a dict so use dictionary .get method to retrieve sqn score
+    sqn_value = sqn_result.get('sqn')
+
     print('Backtest took:{}h {}m'.format(int(total_time/3600), int(total_time/60)%60))
     print('Final Balance: %.2f' % cerebro.broker.getvalue())
-    #print('SQN Score: {:.1f}'.format(sqn_value))
+    print('SQN Score: {:.1f}'.format(sqn_value))
 
     cerebro.plot()
