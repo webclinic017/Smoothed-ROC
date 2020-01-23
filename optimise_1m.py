@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
     # cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name='ta')
     # TODO work out what tradeanalyzer does and if it would be useful for stats
-    # cerebro.addanalyzer(bt.analyzers.SQN, _name='sqn')
+    cerebro.addanalyzer(bt.analyzers.SQN, _name='sqn')
 
     cerebro.broker.setcommission(commission=0.0075)
 
@@ -67,11 +67,11 @@ if __name__ == '__main__':
 
 
 
-    # x = strat.params.roc_period
-    # y = strat.params.sroc_period
-    # z = strat.params.lookback
-    # a = strat.params.stop_sell_perc
-    # b = strat.params.stop_buy_perc
+    x = strat.params.roc_period
+    y = strat.params.sroc_period
+    z = strat.params.lookback
+    a = strat.params.stop_sell_perc
+    b = strat.params.stop_buy_perc
 
     # initialise or load an array for stats
     # if not os.path.exists(f'results_{s_n}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy'): # for optimising stoploss params
@@ -92,27 +92,26 @@ if __name__ == '__main__':
     #         ta_analysis = strategy.analyzers.ta.get_analysis()
     #         print(ta_analysis)
 
-    # initialise or load an array for stats
-    # if not os.path.exists(f'results_{s_n}\{trading_pair}_{a}-{b}_sqn_1m.npy'):  # for optimising sroc params
-    #     sqn_array = np.zeros((100, 50, 100))
-    # else:
-    #     sqn_array = np.load(f'results_{s_n}\{trading_pair}_{a}-{b}_sqn_1m.npy')  # for optimising sroc params
-    #
-    # for run in opt_runs:
-    #     for strategy in run:
-    #         period1 = int(strategy.params.roc_period * 0.1)
-    #         period2 = int(strategy.params.sroc_period * 0.1)
-    #         period3 = int(strategy.params.lookback * 0.1)
-    #         sqn_result = strategy.analyzers.sqn.get_analysis()
-    #         # .get_analysis() returns a dict so use dictionary .get method to retrieve sqn score
-    #         sqn_value = sqn_result.get('sqn')
-    #         print(f'SQN Value:{sqn_value}')
-    #         # store all sqn scores from backtests in a numpy array
-    #         sqn_array[period1][period2][period3] = sqn_value
-    #         ta_analysis = strategy.analyzers.ta.get_analysis()
-    #         print(ta_analysis)
+    ### initialise or load an array for stats
+    if not os.path.exists(f'results_{s_n}\{trading_pair}_{a}-{b}_sqn_1m.npy'):  # for optimising sroc params
+        sqn_array = np.zeros((100, 50, 100))
+    else:
+        sqn_array = np.load(f'results_{s_n}\{trading_pair}_{a}-{b}_sqn_1m.npy')  # for optimising sroc params
 
-# TODO find a way to automatically create a folder with a procedurally generated name
+    for run in opt_runs:
+        for strategy in run:
+            period1 = int(strategy.params.roc_period * 0.1)
+            period2 = int(strategy.params.sroc_period * 0.1)
+            period3 = int(strategy.params.lookback * 0.1)
+            sqn_result = strategy.analyzers.sqn.get_analysis()
+            ### .get_analysis() returns a dict so use dictionary .get method to retrieve sqn score
+            sqn_value = sqn_result.get('sqn')
+            print(f'SQN Value:{sqn_value}')
+            ### store all sqn scores from backtests in a numpy array
+            sqn_array[period1][period2][period3] = sqn_value
+            # ta_analysis = strategy.analyzers.ta.get_analysis()
+            # print(ta_analysis)
+
 
 
     # find index of result with highest score
@@ -122,9 +121,11 @@ if __name__ == '__main__':
     t_end = time.perf_counter()
     total_time = t_end - t_start
 
-    # save the array for future recall
-    # np.save(f'results_{s_n}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy', sqn_array)     # for optimising stoploss params
-    # np.save(f'results_{s_n}\{trading_pair}_{a}-{b}_sqn_1m.npy', sqn_array)     # for optimising sroc params
+    ### save the array for future recall
+    if not os.path.isdir(f'results_{s_n}'):                                         # checks that the relevant folder exists
+        os.mkdir(f'results_{s_n}')                                                  # creates the folder if it doesn't
+    # np.save(f'results_{s_n}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy', sqn_array)    # for optimising stoploss params
+    np.save(f'results_{s_n}\{trading_pair}_{a}-{b}_sqn_1m.npy', sqn_array)          # for optimising sroc params
 
 
     print('Backtest took:{}h {}m'.format(int(total_time/3600), int(total_time/60)%60))
