@@ -229,6 +229,7 @@ class SmoothedRocStops(bt.Strategy):
             print('--------------------------------------------------------------------')
 
     def stop(self):
+        print(f'{self.params.roc_period}, {self.params.sroc_period}, {self.params.lookback}')
         t_elapsed = time.perf_counter()
         elapsed = t_elapsed - self.params.start
         hours = elapsed//3600

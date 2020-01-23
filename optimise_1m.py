@@ -13,12 +13,18 @@ if __name__ == '__main__':
     startcash = 1000
     trading_pair = 'BNBUSDT'
     strategy_name = SmoothedRocStops
-    run_counter = 0
+    counter = {'counter' : 0}
 
 
     cerebro = bt.Cerebro(stdstats=False,optreturn=True,optdatas=True,exactbars=True)
-    cerebro.optstrategy(SmoothedRocStops, roc_period=range(10, 1000, 500), sroc_period=range(10, 500, 250),lookback=range(10, 1000, 500), start=t_start)  # for optimising sroc params
-    # cerebro.optstrategy(SmoothedRocStops, stop_sell_perc = range(1, 3), stop_buy_perc = range(1, 3), start=t_start)                                 # for optimising stoploss params
+    cerebro.optstrategy(SmoothedRocStops,
+                        roc_period=range(10, 1000, 50),    # for optimising sroc params
+                        sroc_period=range(10, 500, 25),    # for optimising sroc params
+                        lookback=range(10, 1000, 50),      # for optimising sroc params
+                        # stop_sell_perc=range(1, 3),         # for optimising stoploss params
+                        # stop_buy_perc=range(1, 3),          # for optimising stoploss params
+                        start=t_start)
+    cerebro.optstrategy(SmoothedRocStops, start=t_start)
 
     datapath = os.path.abspath(os.getcwd() + f'\Data\{trading_pair}-1m-data.csv')
 
@@ -45,7 +51,7 @@ if __name__ == '__main__':
 
     cerebro.addsizer(PercentSizer)
 
-    cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name='ta')
+    # cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name='ta')
     # TODO work out what tradeanalyzer does and if it would be useful for stats
     # cerebro.addanalyzer(bt.analyzers.SQN, _name='sqn')
 
@@ -55,13 +61,13 @@ if __name__ == '__main__':
 
 
 
-    x = SmoothedRocStops.params.roc_period
-    y = SmoothedRocStops.params.sroc_period
-    z = SmoothedRocStops.params.lookback
-    a = SmoothedRocStops.params.stop_sell_perc
-    b = SmoothedRocStops.params.stop_buy_perc
-
-    # initialise or load an array for stats
+    # x = SmoothedRocStops.params.roc_period
+    # y = SmoothedRocStops.params.sroc_period
+    # z = SmoothedRocStops.params.lookback
+    # a = SmoothedRocStops.params.stop_sell_perc
+    # b = SmoothedRocStops.params.stop_buy_perc
+    #
+    # # initialise or load an array for stats
     # if not os.path.exists(f'results_smoothed-roc-stops\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy'): # for optimising stoploss params
     #     sqn_array = np.zeros((2, 2))
     # else:
@@ -79,26 +85,26 @@ if __name__ == '__main__':
     #         sqn_array[perc_sell][perc_buy] = sqn_value
     #         ta_analysis = strategy.analyzers.ta.get_analysis()
     #         print(ta_analysis)
-
-    # initialise or load an array for stats
-    if not os.path.exists(f'results_smoothed-roc-stops\{trading_pair}_{a}-{b}_sqn_1m.npy'):  # for optimising sroc params
-        sqn_array = np.zeros((100, 50, 100))
-    else:
-        sqn_array = np.load(f'results_smoothed-roc-stops\{trading_pair}_{a}-{b}_sqn_1m.npy')  # for optimising sroc params
-
-    for run in opt_runs:
-        for strategy in run:
-            period1 = int(strategy.params.roc_period * 0.1)
-            period2 = int(strategy.params.sroc_period * 0.1)
-            period3 = int(strategy.params.lookback * 0.1)
-            sqn_result = strategy.analyzers.sqn.get_analysis()
-            # .get_analysis() returns a dict so use dictionary .get method to retrieve sqn score
-            sqn_value = sqn_result.get('sqn')
-            print(f'SQN Value:{sqn_value}')
-            # store all sqn scores from backtests in a numpy array
-            sqn_array[period1][period2][period3] = sqn_value
-            ta_analysis = strategy.analyzers.ta.get_analysis()
-            print(ta_analysis)
+    #
+    # # initialise or load an array for stats
+    # if not os.path.exists(f'results_smoothed-roc-stops\{trading_pair}_{a}-{b}_sqn_1m.npy'):  # for optimising sroc params
+    #     sqn_array = np.zeros((100, 50, 100))
+    # else:
+    #     sqn_array = np.load(f'results_smoothed-roc-stops\{trading_pair}_{a}-{b}_sqn_1m.npy')  # for optimising sroc params
+    #
+    # for run in opt_runs:
+    #     for strategy in run:
+    #         period1 = int(strategy.params.roc_period * 0.1)
+    #         period2 = int(strategy.params.sroc_period * 0.1)
+    #         period3 = int(strategy.params.lookback * 0.1)
+    #         sqn_result = strategy.analyzers.sqn.get_analysis()
+    #         # .get_analysis() returns a dict so use dictionary .get method to retrieve sqn score
+    #         sqn_value = sqn_result.get('sqn')
+    #         print(f'SQN Value:{sqn_value}')
+    #         # store all sqn scores from backtests in a numpy array
+    #         sqn_array[period1][period2][period3] = sqn_value
+    #         ta_analysis = strategy.analyzers.ta.get_analysis()
+    #         print(ta_analysis)
 
 # TODO find a way to automatically create a folder with a procedurally generated name
 
