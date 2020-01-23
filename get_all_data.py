@@ -1,12 +1,11 @@
-##### ----- From Peter Nistrup's Medium Article ----- #####
+##### ----- Based on Peter Nistrup's Medium Article ----- #####
 
 # IMPORTS
 import pandas as pd
 import math
 import os.path
-# import time
 from binance.client import Client
-from datetime import timedelta, datetime
+from datetime import datetime
 from dateutil import parser
 import keys
 
@@ -25,6 +24,7 @@ def minutes_of_new_data(symbol, kline_size, data, source):
     if source == "binance":
         new = pd.to_datetime(binance_client.get_klines(symbol=symbol, interval=kline_size)[-1][0], unit='ms')
     return old, new
+
 
 def get_all_binance(symbol, kline_size, save = False):
     filename = f'Data\\{symbol}-{kline_size}-data.csv'
@@ -53,15 +53,22 @@ def get_all_binance(symbol, kline_size, save = False):
     return data_df
 
 
+def get_pairs(quote):
+    info = binance_client.get_exchange_info()
+    symbols = info['symbols']
+    length = len(quote)
+    pairs_list = []
+
+    for item in symbols:
+        if item['symbol'][-length:] == quote:
+            pairs_list.append(item['symbol'])
+
+    return pairs_list
+
 
 ### RUN
 
-# symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT']
-# for symbol in symbols:
-#    get_all_binance(symbol, '1m', save=True)
-
-screener_data = pd.read_csv('crypto_2019-12-12.csv')
-pairs = list(screener_data['Ticker'])
+pairs = get_pairs('USDT')
 print('pairs list: ', pairs)
 for i in range(len(pairs)):
     get_all_binance(pairs[i], '1m', save=True)

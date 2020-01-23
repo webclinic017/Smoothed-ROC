@@ -11,17 +11,23 @@ if __name__ == '__main__':
 
     t_start = time.perf_counter()
     startcash = 1000
-    trading_pair = 'BNBUSDT'
+    trading_pair = 'BTCUSDT'
     strat = SmoothedRocStops
     s_n = strat.params.strat_name      # name of current strategy as a string for generating filenames etc
     counter = {'counter' : 0}
 
 
-    cerebro = bt.Cerebro(stdstats=False,optreturn=True,optdatas=True,exactbars=True)
+    cerebro = bt.Cerebro(
+        stdstats=False,
+        optreturn=True,
+        optdatas=True,
+        # exactbars=True            #
+    )
+
     cerebro.optstrategy(strat,
-                        roc_period=range(10, 1000, 50),    # for optimising sroc params
-                        sroc_period=range(10, 500, 25),    # for optimising sroc params
-                        lookback=range(10, 1000, 50),      # for optimising sroc params
+                        roc_period=range(1, 1000, 50),    # for optimising sroc params
+                        sroc_period=range(1, 500, 25),    # for optimising sroc params
+                        lookback=range(1, 1000, 50),      # for optimising sroc params
                         # stop_sell_perc=range(1, 3),         # for optimising stoploss params
                         # stop_buy_perc=range(1, 3),          # for optimising stoploss params
                         start=t_start)
@@ -61,11 +67,11 @@ if __name__ == '__main__':
 
 
 
-    x = strat.params.roc_period
-    y = strat.params.sroc_period
-    z = strat.params.lookback
-    a = strat.params.stop_sell_perc
-    b = strat.params.stop_buy_perc
+    # x = strat.params.roc_period
+    # y = strat.params.sroc_period
+    # z = strat.params.lookback
+    # a = strat.params.stop_sell_perc
+    # b = strat.params.stop_buy_perc
 
     # initialise or load an array for stats
     # if not os.path.exists(f'results_{s_n}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy'): # for optimising stoploss params
@@ -87,24 +93,24 @@ if __name__ == '__main__':
     #         print(ta_analysis)
 
     # initialise or load an array for stats
-    if not os.path.exists(f'results_{s_n}\{trading_pair}_{a}-{b}_sqn_1m.npy'):  # for optimising sroc params
-        sqn_array = np.zeros((100, 50, 100))
-    else:
-        sqn_array = np.load(f'results_{s_n}\{trading_pair}_{a}-{b}_sqn_1m.npy')  # for optimising sroc params
-
-    for run in opt_runs:
-        for strategy in run:
-            period1 = int(strategy.params.roc_period * 0.1)
-            period2 = int(strategy.params.sroc_period * 0.1)
-            period3 = int(strategy.params.lookback * 0.1)
-            sqn_result = strategy.analyzers.sqn.get_analysis()
-            # .get_analysis() returns a dict so use dictionary .get method to retrieve sqn score
-            sqn_value = sqn_result.get('sqn')
-            print(f'SQN Value:{sqn_value}')
-            # store all sqn scores from backtests in a numpy array
-            sqn_array[period1][period2][period3] = sqn_value
-            ta_analysis = strategy.analyzers.ta.get_analysis()
-            print(ta_analysis)
+    # if not os.path.exists(f'results_{s_n}\{trading_pair}_{a}-{b}_sqn_1m.npy'):  # for optimising sroc params
+    #     sqn_array = np.zeros((100, 50, 100))
+    # else:
+    #     sqn_array = np.load(f'results_{s_n}\{trading_pair}_{a}-{b}_sqn_1m.npy')  # for optimising sroc params
+    #
+    # for run in opt_runs:
+    #     for strategy in run:
+    #         period1 = int(strategy.params.roc_period * 0.1)
+    #         period2 = int(strategy.params.sroc_period * 0.1)
+    #         period3 = int(strategy.params.lookback * 0.1)
+    #         sqn_result = strategy.analyzers.sqn.get_analysis()
+    #         # .get_analysis() returns a dict so use dictionary .get method to retrieve sqn score
+    #         sqn_value = sqn_result.get('sqn')
+    #         print(f'SQN Value:{sqn_value}')
+    #         # store all sqn scores from backtests in a numpy array
+    #         sqn_array[period1][period2][period3] = sqn_value
+    #         ta_analysis = strategy.analyzers.ta.get_analysis()
+    #         print(ta_analysis)
 
 # TODO find a way to automatically create a folder with a procedurally generated name
 
@@ -118,7 +124,7 @@ if __name__ == '__main__':
 
     # save the array for future recall
     # np.save(f'results_{s_n}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy', sqn_array)     # for optimising stoploss params
-    np.save(f'results_{s_n}\{trading_pair}_{a}-{b}_sqn_1m.npy', sqn_array)     # for optimising sroc params
+    # np.save(f'results_{s_n}\{trading_pair}_{a}-{b}_sqn_1m.npy', sqn_array)     # for optimising sroc params
 
 
     print('Backtest took:{}h {}m'.format(int(total_time/3600), int(total_time/60)%60))
