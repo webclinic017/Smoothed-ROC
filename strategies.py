@@ -6,6 +6,7 @@ import time
 class SmoothedROC(bt.Strategy):
 
     params = (
+        ('strat_name', 'smoothed-roc'),
         ('roc_period', 760),
         ('sroc_period', 480),
         ('lookback', 960),
@@ -118,6 +119,7 @@ class SmoothedROC(bt.Strategy):
 class SmoothedRocStops(bt.Strategy):
 
     params = (
+        ('strat_name', 'smoothed-roc-stops'),
         ('roc_period', 760),
         ('sroc_period', 480),
         ('lookback', 960),
