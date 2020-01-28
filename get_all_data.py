@@ -61,11 +61,10 @@ def get_pairs(quote):
 
     for item in symbols:
         if item['symbol'][-length:] == quote:
-            if not item['symbol'][:3] == 'PAX':
+            if not (item['symbol'] in ['PAXUSDT', 'USDSBUSDT', 'BCHSVUSDT', 'BCHABCUSDT', 'VENUSDT', 'TUSDUSDT', 'USDCUSDT', 'USDSUSDT', 'BUSDUSDT']):
                 pairs_list.append(item['symbol'])
 
     return pairs_list
-
 
 ### RUN
 
@@ -73,6 +72,6 @@ pairs = get_pairs('USDT')
 print('pairs list: ', pairs)
 for i in range(len(pairs)):
     get_all_binance(pairs[i], '1m', save=True)
-    print(i)
+    print(f'{i+1} of {len(pairs)} done!')
 
 # get_all_binance('BEAMUSDT', '1m', save=True)
