@@ -27,7 +27,7 @@ def minutes_of_new_data(symbol, kline_size, data, source):
 
 
 def get_all_binance(symbol, kline_size, save = False):
-    filename = f'Data\\{symbol}-{kline_size}-data.csv'
+    filename = f'Z:\\Data\\{symbol}-{kline_size}-data.csv'
     if os.path.isfile(filename):
         data_df = pd.read_csv(filename)
     else:
@@ -61,7 +61,7 @@ def get_pairs(quote):
 
     for item in symbols:
         if item['symbol'][-length:] == quote:
-            if not (item['symbol'] in ['PAXUSDT', 'USDSBUSDT', 'BCHSVUSDT', 'BCHABCUSDT', 'VENUSDT', 'TUSDUSDT', 'USDCUSDT', 'USDSUSDT', 'BUSDUSDT']):
+            if not (item['symbol'] in ['PAXUSDT', 'USDSBUSDT', 'BCHSVUSDT', 'BCHABCUSDT', 'VENUSDT', 'TUSDUSDT', 'USDCUSDT', 'USDSUSDT', 'BUSDUSDT', 'EURUSDT', 'BCCUSDT']):
                 pairs_list.append(item['symbol'])
 
     return pairs_list

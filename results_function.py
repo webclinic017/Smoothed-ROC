@@ -1,52 +1,78 @@
-import math
+import os
+import numpy as np
 
-def results_func(arr_x=100, arr_y=50, arr_z=100, min_x=1, max_x=1000, min_y=1, max_y=500, min_z=1, max_z=1000, results_density = 20)
+def array_func_sl():
 
-    '''
-    function to take in parameters relating to the results that will be generated and
-    automatically generate the numpy array that will be needed to store those results
-    
-    tell the function the parameter ranges you are testing and how many results you want in each dimension
-    the function calculates how big the array needs to be and how to map each param combination to each array index
-    '''
+    '''function to load/create a numpy array of appropriate size and populate it with results from the strategy object,
+    then save the array with a procedurally generated filename'''
 
-    # size of numpy array to record results
-    array_x = arr_x
-    array_y = arr_y
-    array_z = arr_z
+    ## initialise or load an array for stats
+    if not os.path.exists(f'results_{s_n}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy'): # for optimising stoploss params
+        sqn_array = np.zeros((2, 2))
+    else:
+        sqn_array = np.load(f'results_{s_n}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy')# for optimising stoploss params
 
-    # range of parameter values for cerebro optimisation to run through
-    range_min_x = min_x
-    range_max_x = max_x
-    range_min_y = min_y
-    range_max_y = max_y
-    range_min_z = min_z
-    range_max_z = max_z
+    for run in opt_runs:
+        for strategy in run:
+            perc_sell = strategy.params.stop_sell_perc
+            perc_buy = strategy.params.stop_buy_perc
+            sqn_result = strategy.analyzers.sqn.get_analysis()
+            # .get_analysis() returns a dict so use dictionary .get method to retrieve sqn score
+            sqn_value = sqn_result.get('sqn')
+            print(f'SQN Value:{sqn_value}')
+            # store all sqn scores from backtests in a numpy array
+            sqn_array[perc_sell][perc_buy] = sqn_value
+            ta_analysis = strategy.analyzers.ta.get_analysis()
+            print(ta_analysis)
 
-    # how many different values within that range to actually test
-    results_amount_x = results_density
-    results_amount_y = results_density
-    results_amount_z = results_density
+    # find index of result with highest score
+    # max = np.amax(sqn_array[sqn_array != 0])  # if all values are below zero, this will ignore the zeros
+    # ind_max = np.argwhere(sqn_array == max)
 
-    # translate those numbers into step size for python
-    step_size_x = math.ceil((range_max_x-range_min_x)/results_amount_x)
-    step_size_y = math.ceil((range_max_y-range_min_y)/results_amount_y)
-    step_size_z = math.ceil((range_max_z-range_min_z)/results_amount_z)
+    ### save the array for future recall
+    if not os.path.isdir(f'results_{s_n}'):  # checks that the relevant folder exists
+        os.mkdir(f'results_{s_n}')  # creates the folder if it doesn't
+    # np.save(f'results_{s_n}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy', sqn_array)    # for optimising stoploss params
+    np.save(f'results_{s_n}\{trading_pair}_{a}-{b}_sqn_1m.npy', sqn_array)  # for optimising sroc params
 
-    # calculate the relationship between param values and position in array
-    scale_x = range_max_x/array_x
-    scale_y = range_max_y/array_y
-    scale_z = range_max_z/array_z
+    # print('Best Settings: {}'.format(ind_max * 10))
+    # print('SQN Score: {:.1f}'.format(max))
 
-    # example param values
-    param_x = 50
-    param_y = 50
-    param_z = 50
 
-    # calculate array index for given param value
-    index_x = param_x/scale_x
-    index_y = param_y/scale_y
-    index_z = param_z/scale_z
+def array_func_sroc(opt_runs, s_n, trading_pair, rq, a, b, roc, sroc, lb, ta_res, sqn_res):
 
-    return index_x, index_y, index_z
-    print(f'x steps: {step_size_x}\ny steps: {step_size_y}\nz steps: {step_size_z}')
+    '''function to load/create a numpy array of appropriate size and populate it with results from the strategy object,
+        then save the array with a procedurally generated filename'''
+
+    range_x = roc[1] - roc[0]
+    range_y = sroc[1] - sroc[0]
+    range_z = lb[1] - lb[0]
+
+    ### initialise an array for sqn stats
+    sqn_array = np.zeros((rq, rq, rq))
+
+    for run in opt_runs:
+        for strategy in run:
+            period1 = int(strategy.params.roc_period * rq/range_x)
+            period2 = int(strategy.params.sroc_period * rq/range_y)
+            period3 = int(strategy.params.lookback * rq/range_z)
+            sqn_result = strategy.analyzers.sqn.get_analysis()
+            ### .get_analysis() returns a dict so use dictionary .get method to retrieve sqn score
+            sqn_value = sqn_result.get('sqn')
+            # print(f'SQN Value:{sqn_value}')
+            ### store all sqn scores from backtests in a numpy array
+            sqn_array[period1][period2][period3] = sqn_value
+
+
+    ### save the array for future recall
+    if not os.path.isdir(f'results_{s_n}'):  # checks that the relevant folder exists
+        os.mkdir(f'results_{s_n}')  # creates the folder if it doesn't
+
+    np.save(f'results_{s_n}\{trading_pair}_{a}-{b}_sqn_1m.npy', sqn_array)  # for optimising sroc params
+
+    ### find index of result with highest score
+    max = np.amax(sqn_array[sqn_array != 0])  # if all values are below zero, this will ignore the zeros
+    ind_max = np.argwhere(sqn_array == max)
+
+    print('Best Settings: {}'.format(ind_max * 10))
+    print('SQN Score: {:.1f}'.format(max))

@@ -1,9 +1,7 @@
 import backtrader as bt
 import backtrader.feeds as btfeeds
-import os
 import datetime
 import time
-import math
 import matplotlib
 from strategies import SmoothedROC
 from strategies import SmoothedRocStops
@@ -149,7 +147,7 @@ if __name__ == '__main__':
 
     cerebro = bt.Cerebro()
     cerebro.addstrategy(SmoothedRocStops, start=t_start)
-    datapath = os.path.abspath(os.getcwd() + f'\Data\{trading_pair}-1m-data.csv')
+    datapath = f'Z:\Data\{trading_pair}-1m-data.csv'
 
     # Create a data feed
     data = btfeeds.GenericCSVData(
@@ -176,7 +174,7 @@ if __name__ == '__main__':
     cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name='ta')
     cerebro.addanalyzer(bt.analyzers.SQN, _name='sqn')
 
-    cerebro.broker.setcommission(commission=0.0075)
+    cerebro.broker.setcommission(commission=0.00075)
 
     print('Starting Balance: %.2f' % cerebro.broker.getvalue())
 
