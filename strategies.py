@@ -2,6 +2,8 @@ import datetime
 import backtrader as bt
 import time
 
+run_counter = 0
+
 
 class SmoothedROC(bt.Strategy):
 
@@ -231,12 +233,12 @@ class SmoothedRocStops(bt.Strategy):
             print('--------------------------------------------------------------------')
 
     def stop(self):
-        print(f'{self.params.roc_period}, {self.params.sroc_period}, {self.params.lookback}')
+        # print(f'{self.params.roc_period}, {self.params.sroc_period}, {self.params.lookback}')
+
         t_elapsed = time.perf_counter()
         elapsed = t_elapsed - self.params.start
         hours = elapsed//3600
         minutes = elapsed//60
-        global run_counter
         # run_counter += 1
         # print(f'Run number:{run_counter}')
-        print(f'Time elapsed:{hours}h {minutes%60}m')
+        print(f'Time elapsed:{int(hours)}h {int(minutes%60)}m')

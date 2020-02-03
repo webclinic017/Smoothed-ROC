@@ -8,6 +8,7 @@ from binance.client import Client
 from datetime import datetime
 from dateutil import parser
 import keys
+from pathlib import Path
 
 ### CONSTANTS
 binsizes = {"1m": 1, "5m": 5, "1h": 60, "1d": 1440}
@@ -27,7 +28,7 @@ def minutes_of_new_data(symbol, kline_size, data, source):
 
 
 def get_all_binance(symbol, kline_size, save = False):
-    filename = f'Z:\\Data\\{symbol}-{kline_size}-data.csv'
+    filename = Path(f'Z:/Data/{symbol}-{kline_size}-data.csv')
     if os.path.isfile(filename):
         data_df = pd.read_csv(filename)
     else:

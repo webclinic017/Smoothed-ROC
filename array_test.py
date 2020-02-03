@@ -1,20 +1,30 @@
 import numpy as np
-from strategies import SmoothedRocStops
+import math
+from pathlib import Path
 
-def stats(trading_pair):
-    a = np.load(f'results_smoothed-roc-stops\{trading_pair}_760-480-960_sqn_1m.npy')
+# TODO Try ang get this working with more intelligent inputs than the strings it is currently using
 
-    # max = np.amax(a[a != 0])
-    # ind_max = np.argwhere(a == max)
-    # avg = np.mean(a[a != 0])
+def stats(s_n, range_str, a, b, date_range, trading_pair):
+    data_source = Path(f'results/{s_n}/{range_str}/sl{a}-{b}/{date_range}/sqn/{trading_pair}_1m.npy')
+    arr = np.load(data_source)
 
-    # print(f'Best SQN score: {max:.1f}, settings: {ind_max*10}.\nMean SQN score for all settings: {avg:.2f}')
-    # print(f'Array shape: {a.shape}')
-    # if using avg sqn score to compare different strategies or trading pairs, remember that they must all be from the same date range
-    return a
+    max = np.amax(arr)
+    ind_max = np.argwhere(arr == max)
+    avg = np.mean(arr)
 
-print(stats('BNBUSDT'))
+    range_lst = range_str.split(',')
+    range_x = range_lst[0].split('-')
+    range_y = range_lst[1].split('-')
+    range_z = range_lst[2].split('-')
+    range_x[0], range_x[1] = int(range_x[0]), int(range_x[1])
+    range_y[0], range_y[1] = int(range_y[0]), int(range_y[1])
+    range_z[0], range_z[1] = int(range_z[0]), int(range_z[1])
+    x_step = math.ceil((range_x[1] - range_x[0]) / len(a))
+    y_step = math.ceil((range_y[1] - range_y[0]) / len(a))
+    z_step = math.ceil((range_z[1] - range_z[0]) / len(a))
 
+    print(f'Best SQN score: {max:.1f}, settings: {(ind_max[0][0] * x_step) + range_x[0]}, {(ind_max[0][1] * y_step) + range_y[0]}, {(ind_max[0][2] * z_step) + range_z[0]}.\nMean SQN score for all settings: {avg:.2f}')
+    print(f'Array shape: {arr.shape}')
+    ### if using avg sqn score to compare different strategies or trading pairs, remember that they must all be from the same date range
 
-# TODO it might be worth writing a short txt file with each opt run to record param settings, so i know what settings produced each backtest
-# TODO or it might even be a better idea to create folders based on param settings so that every results array produced by an opt run automatically goes into a folder with other comparable results arrays
+stats('smoothed-roc-stops', '10-100,10-50,10-100', '50', '50', '2020-01-01_2020-01-29', 'ETHUSDT')

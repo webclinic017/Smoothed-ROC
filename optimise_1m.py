@@ -7,23 +7,26 @@ from sizers import PercentSizer
 from strategies import SmoothedRocStops
 import extensions as ex
 import results_function as rf
+from pathlib import Path
 
 if __name__ == '__main__':
 
     startcash = 1000
-    trading_pair = 'BTCUSDT'
+    trading_pair = 'ETHUSDT'
     strat = SmoothedRocStops
     s_n = strat.params.strat_name      # name of current strategy as a string for generating filenames etc
-    counter = {'counter' : 0}
+    run_counter = 0           # TODO implement run counter
     ta_results = False
     sqn_results = True
     signal_or_sl = True                 # True if optimising signal params, False if optimising stoploss params
+    start_date = datetime.datetime(2020, 1, 1)
+    end_date = datetime.datetime(2020, 1, 29)
 
     ### optimisation params
-    rq = 4           # results quantity
-    roc = (1, 1000)   # roc range
-    sroc = (1, 500)   # sroc range
-    lb = (1, 1000)    # lookback range
+    rq = 2           # results quantity
+    roc = (10, 100)   # roc range
+    sroc = (10, 50)   # sroc range
+    lb = (10, 100)    # lookback range
     ss = (1, 5)       # stop sell range
     sb = (1, 5)       # stop buy range
 
@@ -49,13 +52,13 @@ if __name__ == '__main__':
                         # stop_buy_perc=range(sb[0], sb[1]),
                         start=t_start)
 
-    datapath = f'Z:\Data\{trading_pair}-1m-data.csv'
+    datapath = Path(f'Z:/Data/{trading_pair}-1m-data.csv')
 
     # Create a data feed
     data = btfeeds.GenericCSVData(
         dataname=datapath,
-        fromdate=datetime.datetime(2020, 1, 1),
-        todate=datetime.datetime(2020,1,29),
+        fromdate=start_date,
+        todate=end_date,
         dtformat=('%Y-%m-%d %H:%M:%S'),
         datetime=0,
         high=2,
@@ -89,14 +92,11 @@ if __name__ == '__main__':
     z = strat.params.lookback
 
     if signal_or_sl:
-        rf.array_func_sroc(opt_runs, s_n, trading_pair, rq, a, b, roc, sroc, lb, ta_results, sqn_results)
+        rf.array_func_sroc(opt_runs, s_n, trading_pair, rq, a, b, roc, sroc, lb, ta_results, sqn_results, start_date, end_date)
     else:
-        rf.array_func_sl(opt_runs, s_n, trading_pair, rq, x, y, z, a, b, ta_results, sqn_results)
+        rf.array_func_sl(opt_runs, s_n, trading_pair, rq, x, y, z, a, b, ta_results, sqn_results, start_date, end_date)
 
-
-
-
-
-    print(f'Total time: {t_end - t_start}')
-
-
+    t = t_end - t_start
+    hours = t // 3600
+    minutes = t // 60
+    print(f'Time elapsed:{int(hours)}h {int(minutes%60)}m')
