@@ -26,8 +26,8 @@ rq = 2           # results quantity
 roc = (10, 100)   # roc range
 sroc = (10, 50)   # sroc range
 lb = (10, 100)    # lookback range
-ss = (1, 5)       # stop sell range
-sb = (1, 5)       # stop buy range
+ss = (1, 50)       # stop sell range
+sb = (1, 50)       # stop buy range
 
 r_step = ex.param_step(rq, roc[0], roc[1])
 sr_step = ex.param_step(rq, sroc[0], sroc[1])

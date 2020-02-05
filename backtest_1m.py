@@ -9,16 +9,16 @@ from strategies import SmoothedRocStops
 from extensions import printTradeAnalysis
 
 startcash = 1000
-trading_pair = 'BTCUSDT'
+trading_pair = 'BNBUSDT'
 strat = SmoothedRocStops
 s_n = strat.params.strat_name
-roc = 950
-sroc = 900
-lb = 850
-ss = 5
-sb = 5
+roc = 251
+sroc = 76
+lb = 301
+ss = 50
+sb = 50
 start_date = datetime.datetime(2020, 1, 1)
-end_date = datetime.datetime(2020, 1, 5)        # Can cause errors if too close to start_date
+end_date = datetime.datetime(2020, 1, 30)        # Can cause errors if too close to start_date
 
 t_start = time.perf_counter()
 
