@@ -1,7 +1,8 @@
 import os
 import numpy as np
+from pathlib import Path
 
-def array_func_sroc(opt_runs, s_n, trading_pair, rq, a, b, roc, sroc, lb, ta_res, sqn_res, start, end):
+def array_func_sroc(opt_runs, s_n, trading_pair, rq, a, b, roc, sroc, lb, pnl_res, sqn_res, start, end):
 
     '''function to create a numpy array of appropriate size and populate it with results from the strategy object,
         then save the array with a procedurally generated path and filename'''
@@ -11,84 +12,179 @@ def array_func_sroc(opt_runs, s_n, trading_pair, rq, a, b, roc, sroc, lb, ta_res
     range_z = lb[1] - lb[0]
     range_str = f'{roc[0]}-{roc[1]},{sroc[0]}-{sroc[1]},{lb[0]}-{lb[1]}'
 
+    x_step = math.ceil(range_x / rq)
+    y_step = math.ceil(range_y / rq)
+    z_step = math.ceil(range_z / rq)
+
     start_date = str(start)
     end_date = str(end)
     date_range = f'{start_date[:10]}_{end_date[:10]}'
 
-    ### initialise an array for sqn stats
-    sqn_array = np.zeros((rq, rq, rq))
+    if sqn_res:
+        ### initialise an array for sqn stats
+        sqn_array = np.zeros((rq, rq, rq))
 
-    for run in opt_runs:
-        for strategy in run:
-            period1 = int(strategy.params.roc_period * rq/range_x)
-            period2 = int(strategy.params.sroc_period * rq/range_y)
-            period3 = int(strategy.params.lookback * rq/range_z)
-            sqn_result = strategy.analyzers.sqn.get_analysis()
-            ### .get_analysis() returns a dict so use dictionary .get method to retrieve sqn score
-            sqn_value = sqn_result.get('sqn')
-            # print(f'SQN Value:{sqn_value}')
-            ### store all sqn scores from backtests in a numpy array
-            sqn_array[period1][period2][period3] = sqn_value
+        for run in opt_runs:
+            for strategy in run:
+                period1 = int(strategy.params.roc_period * rq/range_x)
+                period2 = int(strategy.params.sroc_period * rq/range_y)
+                period3 = int(strategy.params.lookback * rq/range_z)
+                sqn_result = strategy.analyzers.sqn.get_analysis()
+                ### .get_analysis() returns a dict so use dictionary .get method to retrieve sqn score
+                sqn_value = sqn_result.get('sqn')
+                # print(f'SQN Value:{sqn_value}')
+                ### store all sqn scores from backtests in a numpy array
+                sqn_array[period1][period2][period3] = sqn_value
 
 
-    ### save the array for future recall
-    if not os.path.isdir(f'results'):  # checks that the relevant folder exists
-        os.mkdir(f'results')  # creates the folder if it doesn't
-    if not os.path.isdir(f'results\{s_n}'):  # checks that the relevant folder exists
-        os.mkdir(f'results\{s_n}')  # creates the folder if it doesn't
-    if not os.path.isdir(f'results\{s_n}\\{range_str}'):  # checks that the relevant folder exists
-        os.mkdir(f'results\{s_n}\\{range_str}')  # creates the folder if it doesn't
-    if not os.path.isdir(f'results\{s_n}\\{range_str}\\sl{a}-{b}'):  # checks that the relevant folder exists
-        os.mkdir(f'results\{s_n}\\{range_str}\\sl{a}-{b}')  # creates the folder if it doesn't
-    if not os.path.isdir(f'results\{s_n}\\{range_str}\\sl{a}-{b}\\{date_range}'):  # checks that the relevant folder exists
-        os.mkdir(f'results\{s_n}\\{range_str}\\sl{a}-{b}\\{date_range}')  # creates the folder if it doesn't
-    if not os.path.isdir(f'results\{s_n}\\{range_str}\\sl{a}-{b}\\{date_range}\\sqn'):  # checks that the relevant folder exists
-        os.mkdir(f'results\{s_n}\\{range_str}\\sl{a}-{b}\\{date_range}\\sqn')  # creates the folder if it doesn't
+        ### save the array for future recall
+        if not os.path.isdir(Path(f'Z:/results')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}/sqn')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}/sqn'))  # creates the folder if it doesn't
 
-    np.save(f'results\{s_n}\\{range_str}\\sl{a}-{b}\\{date_range}\\sqn\{trading_pair}_1m.npy', sqn_array)  # for optimising sroc params
+        np.save(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}/sqn/{trading_pair}_1m.npy'), sqn_array)  # for optimising sroc params
 
-    ### find index of result with highest score
-    max = np.amax(sqn_array[sqn_array != 0])  # if all values are below zero, this will ignore the zeros
-    ind_max = np.argwhere(sqn_array == max)
-    avg = np.mean(a)
+        ### find index of result with highest score
+        max = np.amax(sqn_array)
+        ind_max = np.argwhere(sqn_array == max)
+        avg = np.mean(sqn_array)
 
-    print(f'Best SQN score: {max:.1f}, settings: {ind_max[0]*range_x/rq},{ind_max[0]*range_y/rq}{ind_max[0]*range_z/rq}.\nMean SQN score for all settings: {avg:.2f}')
+        print(f'Best SQN score: {max:.1f}, settings: {(ind_max[0][0] * x_step) + range_x[0]}, {(ind_max[0][1] * y_step) + range_y[0]}, {(ind_max[0][2] * z_step) + range_z[0]}.\nMean SQN score for all settings: {avg:.2f}')
+
+    if pnl_res:
+        ### initialise an array for ta stats
+        pnl_array = np.zeros((rq, rq, rq))
+
+        for run in opt_runs:
+            for strategy in run:
+                period1 = int(strategy.params.roc_period * rq / range_x)
+                period2 = int(strategy.params.sroc_period * rq / range_y)
+                period3 = int(strategy.params.lookback * rq / range_z)
+                pnl_value = strategy.analyzers.ta.get_analysis()['pnl']['net']['average']
+                ### store all pnl scores from backtests in a numpy array
+                pnl_array[period1][period2][period3] = pnl_value
+
+        ### save the array for future recall
+        if not os.path.isdir(Path(f'Z:/results')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}/pnl')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}/pnl'))  # creates the folder if it doesn't
+
+        np.save(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}/pnl/{trading_pair}_1m.npy'), pnl_array)
+
+        ### find index of result with highest score
+        max = np.amax(pnl_array)
+        ind_max = np.argwhere(pnl_array == max)
+        avg = np.mean(pnl_array)
+
+        print(f'Best PnL score: {max:.1f}, settings: {(ind_max[0][0] * x_step) + range_x[0]}, {(ind_max[0][1] * y_step) + range_y[0]}, {(ind_max[0][2] * z_step) + range_z[0]}.\nMean PnL score for all settings: {avg:.2f}')
 
 # TODO get array_func_sl working the same way as array_func_roc
 
-def array_func_sl():
+def array_func_sl(opt_runs, s_n, trading_pair, rq, x, y, z, ss, sb, pnl_res, sqn_res, start, end):
 
-    '''function to load/create a numpy array of appropriate size and populate it with results from the strategy object,
-    then save the array with a procedurally generated filename'''
+    '''function to create a numpy array of appropriate size and populate it with results from the strategy object,
+        then save the array with a procedurally generated path and filename'''
 
-    ## initialise or load an array for stats
-    if not os.path.exists(f'results_{s_n}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy'): # for optimising stoploss params
-        sqn_array = np.zeros((2, 2))
-    else:
-        sqn_array = np.load(f'results_{s_n}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy')# for optimising stoploss params
+    range_a = ss[1] - ss[0]
+    range_b = sb[1] - sb[0]
+    range_str = f'{ss[0]}-{ss[1]},{sb[0]}-{sb[1]}'
 
-    for run in opt_runs:
-        for strategy in run:
-            perc_sell = strategy.params.stop_sell_perc
-            perc_buy = strategy.params.stop_buy_perc
-            sqn_result = strategy.analyzers.sqn.get_analysis()
-            # .get_analysis() returns a dict so use dictionary .get method to retrieve sqn score
-            sqn_value = sqn_result.get('sqn')
-            print(f'SQN Value:{sqn_value}')
-            # store all sqn scores from backtests in a numpy array
-            sqn_array[perc_sell][perc_buy] = sqn_value
-            ta_analysis = strategy.analyzers.ta.get_analysis()
-            print(ta_analysis)
+    a_step = math.ceil(range_a / rq)
+    b_step = math.ceil(range_b / rq)
 
-    # find index of result with highest score
-    # max = np.amax(sqn_array[sqn_array != 0])  # if all values are below zero, this will ignore the zeros
-    # ind_max = np.argwhere(sqn_array == max)
+    start_date = str(start)
+    end_date = str(end)
+    date_range = f'{start_date[:10]}_{end_date[:10]}'
 
-    ### save the array for future recall
-    if not os.path.isdir(f'results_{s_n}'):  # checks that the relevant folder exists
-        os.mkdir(f'results_{s_n}')  # creates the folder if it doesn't
-    # np.save(f'results_{s_n}\{trading_pair}_{x}-{y}-{z}_sqn_1m.npy', sqn_array)    # for optimising stoploss params
-    np.save(f'results_{s_n}\{trading_pair}_{a}-{b}_sqn_1m.npy', sqn_array)  # for optimising sroc params
+    if sqn_res:
+        ### initialise an array for sqn stats
+        sqn_array = np.zeros((rq, rq))
 
-    # print('Best Settings: {}'.format(ind_max * 10))
-    # print('SQN Score: {:.1f}'.format(max))
+        for run in opt_runs:
+            for strategy in run:
+                period1 = int(strategy.params.stop_sell_perc * rq/range_a)
+                period2 = int(strategy.params.stop_buy_perc * rq/range_b)
+                sqn_result = strategy.analyzers.sqn.get_analysis()
+                ### .get_analysis() returns a dict so use dictionary .get method to retrieve sqn score
+                sqn_value = sqn_result.get('sqn')
+                # print(f'SQN Value:{sqn_value}')
+                ### store all sqn scores from backtests in a numpy array
+                sqn_array[period1][period2] = sqn_value
+
+
+        ### save the array for future recall
+        if not os.path.isdir(Path(f'Z:/results')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}/sqn')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}/sqn'))  # creates the folder if it doesn't
+
+        np.save(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}/sqn/{trading_pair}_1m.npy'), sqn_array)  # for optimising sroc params
+
+        ### find index of result with highest score
+        max = np.amax(sqn_array)
+        ind_max = np.argwhere(sqn_array == max)
+        avg = np.mean(sqn_array)
+
+        print(f'Best SQN score: {max:.1f}, settings: {(ind_max[0][0] * a_step) + range_a[0]}, {(ind_max[0][1] * b_step) + range_b[0]}.\nMean SQN score for all settings: {avg:.2f}')
+
+    if pnl_res:
+        ### initialise an array for ta stats
+        pnl_array = np.zeros((rq, rq))
+
+        for run in opt_runs:
+            for strategy in run:
+                period1 = int(strategy.params.roc_period * rq / range_a)
+                period2 = int(strategy.params.sroc_period * rq / range_b)
+                pnl_value = strategy.analyzers.ta.get_analysis()['pnl']['net']['average']
+                ### store all pnl scores from backtests in a numpy array
+                pnl_array[period1][period2] = pnl_value
+
+        ### save the array for future recall
+        if not os.path.isdir(Path(f'Z:/results')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}/pnl')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}/pnl'))  # creates the folder if it doesn't
+
+        np.save(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}/pnl/{trading_pair}_1m.npy'), pnl_array)  # for optimising sroc params
+
+        ### find index of result with highest score
+        max = np.amax(pnl_array)
+        ind_max = np.argwhere(pnl_array == max)
+        avg = np.mean(pnl_array)
+
+        print(f'Best PnL score: {max:.1f}, settings: {(ind_max[0][0] * a_step) + range_a[0]}, {(ind_max[0][1] * b_step) + range_b[0]}.\nMean PnL score for all settings: {avg:.2f}')
+

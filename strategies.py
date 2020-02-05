@@ -1,11 +1,12 @@
 import datetime
 import backtrader as bt
 import time
+from tqdm import tqdm
 
 run_counter = 0
 
 
-class SmoothedROC(bt.Strategy):
+class SmoothedRoc(bt.Strategy):
 
     params = (
         ('strat_name', 'smoothed-roc'),
@@ -136,6 +137,7 @@ class SmoothedRocStops(bt.Strategy):
         #print('%s, %s' % (dt.isoformat(), txt))
 
     def __init__(self):
+        # self.iteration_progress = tqdm(desc='Total runs', total=(self.datas[0].close.buflen()))       # possible progress bar
         self.startcash = self.broker.getvalue()
         self.dataclose = self.datas[0].close
         self.order = None
@@ -183,6 +185,9 @@ class SmoothedRocStops(bt.Strategy):
                  (trade.pnl, trade.pnlcomm))
 
     def next(self):
+        # self.iteration_progress.update()                                                              # possible progress bar
+        # self.iteration_progress.set_description(                                                      # possible progress bar
+        #     "Processing {} out of {}".format(len(self.datas[0].close), self.datas[0].close.buflen())) # possible progress bar
         self.log('Close, %.2f' % self.dataclose[0])
 
         if self.order:

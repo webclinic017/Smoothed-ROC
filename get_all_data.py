@@ -6,6 +6,7 @@ import math
 import os.path
 from binance.client import Client
 from datetime import datetime
+import time
 from dateutil import parser
 import keys
 from pathlib import Path
@@ -69,10 +70,16 @@ def get_pairs(quote):
 
 ### RUN
 
+start = time.perf_counter()
+
 pairs = get_pairs('USDT')
 print('pairs list: ', pairs)
 for i in range(len(pairs)):
     get_all_binance(pairs[i], '1m', save=True)
     print(f'{i+1} of {len(pairs)} done!')
 
-# get_all_binance('BEAMUSDT', '1m', save=True)
+# get_all_binance('BTCUSDT', '1m', save=True)
+
+end = time.perf_counter()
+total = round(end - start)
+print(f'Time taken: {total//60}m {total%60}s')
