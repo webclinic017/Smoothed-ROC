@@ -40,3 +40,4 @@ def printTradeAnalysis(analyzer):
 class RunCounter:
     def __init__(self, counter):
         self.counter = counter
+

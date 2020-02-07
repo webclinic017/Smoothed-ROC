@@ -1,7 +1,7 @@
 import datetime
 import backtrader as bt
 import time
-from tqdm import tqdm
+# from tqdm import tqdm
 
 run_counter = 0
 
@@ -123,9 +123,9 @@ class SmoothedRocStops(bt.Strategy):
 
     params = (
         ('strat_name', 'smoothed-roc-stops'),
-        ('roc_period', 760),
-        ('sroc_period', 480),
-        ('lookback', 960),
+        ('roc_period', 251),
+        ('sroc_period', 76),
+        ('lookback', 301),
         ('stop_sell_perc', 50),
         ('stop_buy_perc', 50),
         ('start', 0),
@@ -237,13 +237,11 @@ class SmoothedRocStops(bt.Strategy):
             print('9: Position Size:                        {}'.format(self.position.size))
             print('--------------------------------------------------------------------')
 
-    def stop(self):
+    # def stop(self):
         # print(f'{self.params.roc_period}, {self.params.sroc_period}, {self.params.lookback}')
 
-        t_elapsed = time.perf_counter()
-        elapsed = t_elapsed - self.params.start
-        hours = elapsed//3600
-        minutes = elapsed//60
-        # run_counter += 1
-        # print(f'Run number:{run_counter}')
-        print(f'Time elapsed:{int(hours)}h {int(minutes%60)}m')
+        # t_elapsed = time.perf_counter()
+        # elapsed = t_elapsed - self.params.start
+        # hours = elapsed//3600
+        # minutes = elapsed//60
+        # print(f'Time elapsed:{int(hours)}h {int(minutes%60)}m')

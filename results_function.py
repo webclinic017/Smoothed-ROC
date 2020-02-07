@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from pathlib import Path
+import math
 
 def array_func_sroc(opt_runs, s_n, trading_pair, rq, a, b, roc, sroc, lb, pnl_res, sqn_res, start, end):
 
@@ -46,19 +47,21 @@ def array_func_sroc(opt_runs, s_n, trading_pair, rq, a, b, roc, sroc, lb, pnl_re
             os.mkdir(Path(f'Z:/results/{s_n}/{range_str}'))  # creates the folder if it doesn't
         if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}')):  # checks that the relevant folder exists
             os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}'))  # creates the folder if it doesn't
-        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}')):  # checks that the relevant folder exists
-            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}'))  # creates the folder if it doesn't
-        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}/sqn')):  # checks that the relevant folder exists
-            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}/sqn'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{rq}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{rq}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{rq}/{date_range}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{rq}/{date_range}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{rq}/{date_range}/sqn')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{rq}/{date_range}/sqn'))  # creates the folder if it doesn't
 
-        np.save(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}/sqn/{trading_pair}_1m.npy'), sqn_array)  # for optimising sroc params
+        np.save(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{rq}/{date_range}/sqn/{trading_pair}_1m.npy'), sqn_array)  # for optimising sroc params
 
         ### find index of result with highest score
         max = np.amax(sqn_array)
         ind_max = np.argwhere(sqn_array == max)
         avg = np.mean(sqn_array)
 
-        print(f'Best SQN score: {max:.1f}, settings: {(ind_max[0][0] * x_step) + range_x[0]}, {(ind_max[0][1] * y_step) + range_y[0]}, {(ind_max[0][2] * z_step) + range_z[0]}.\nMean SQN score for all settings: {avg:.2f}')
+        print(f'Best SQN score: {max:.1f}, settings: {(ind_max[0][0] * x_step) + roc[0]}, {(ind_max[0][1] * y_step) + sroc[0]}, {(ind_max[0][2] * z_step) + lb[0]}.\nMean SQN score for all settings: {avg:.2f}')
 
     if pnl_res:
         ### initialise an array for ta stats
@@ -82,19 +85,21 @@ def array_func_sroc(opt_runs, s_n, trading_pair, rq, a, b, roc, sroc, lb, pnl_re
             os.mkdir(Path(f'Z:/results/{s_n}/{range_str}'))  # creates the folder if it doesn't
         if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}')):  # checks that the relevant folder exists
             os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}'))  # creates the folder if it doesn't
-        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}')):  # checks that the relevant folder exists
-            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}'))  # creates the folder if it doesn't
-        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}/pnl')):  # checks that the relevant folder exists
-            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}/pnl'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{rq}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{rq}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{rq}/{date_range}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{rq}/{date_range}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{rq}/{date_range}/pnl')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{rq}/{date_range}/pnl'))  # creates the folder if it doesn't
 
-        np.save(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{date_range}/pnl/{trading_pair}_1m.npy'), pnl_array)
+        np.save(Path(f'Z:/results/{s_n}/{range_str}/sl{a}-{b}/{rq}/{date_range}/pnl/{trading_pair}_1m.npy'), pnl_array)  # for optimising sroc params
 
         ### find index of result with highest score
         max = np.amax(pnl_array)
         ind_max = np.argwhere(pnl_array == max)
         avg = np.mean(pnl_array)
 
-        print(f'Best PnL score: {max:.1f}, settings: {(ind_max[0][0] * x_step) + range_x[0]}, {(ind_max[0][1] * y_step) + range_y[0]}, {(ind_max[0][2] * z_step) + range_z[0]}.\nMean PnL score for all settings: {avg:.2f}')
+        print(f'Best PnL score: {max:.1f}, settings: {(ind_max[0][0] * x_step) + roc[0]}, {(ind_max[0][1] * y_step) + sroc[0]}, {(ind_max[0][2] * z_step) + lb[0]}.\nMean PnL score for all settings: {avg:.2f}')
 
 # TODO get array_func_sl working the same way as array_func_roc
 
@@ -137,21 +142,23 @@ def array_func_sl(opt_runs, s_n, trading_pair, rq, x, y, z, ss, sb, pnl_res, sqn
             os.mkdir(Path(f'Z:/results/{s_n}'))  # creates the folder if it doesn't
         if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}')):  # checks that the relevant folder exists
             os.mkdir(Path(f'Z:/results/{s_n}/{range_str}'))  # creates the folder if it doesn't
-        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}')):  # checks that the relevant folder exists
-            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}'))  # creates the folder if it doesn't
-        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}')):  # checks that the relevant folder exists
-            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}'))  # creates the folder if it doesn't
-        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}/sqn')):  # checks that the relevant folder exists
-            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}/sqn'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}/{rq}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}/{rq}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}/{rq}/{date_range}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}/{rq}/{date_range}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}/{rq}/{date_range}/sqn')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}/{rq}/{date_range}/sqn'))  # creates the folder if it doesn't
 
-        np.save(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}/sqn/{trading_pair}_1m.npy'), sqn_array)  # for optimising sroc params
+        np.save(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}/{rq}/{date_range}/sqn/{trading_pair}_1m.npy'), sqn_array)  # for optimising sroc params
 
         ### find index of result with highest score
         max = np.amax(sqn_array)
         ind_max = np.argwhere(sqn_array == max)
         avg = np.mean(sqn_array)
 
-        print(f'Best SQN score: {max:.1f}, settings: {(ind_max[0][0] * a_step) + range_a[0]}, {(ind_max[0][1] * b_step) + range_b[0]}.\nMean SQN score for all settings: {avg:.2f}')
+        print(f'Best SQN score: {max:.1f}, settings: {(ind_max[0][0] * a_step) + ss[0]}, {(ind_max[0][1] * b_step) + sb[0]}.\nMean SQN score for all settings: {avg:.2f}')
 
     if pnl_res:
         ### initialise an array for ta stats
@@ -172,19 +179,21 @@ def array_func_sl(opt_runs, s_n, trading_pair, rq, x, y, z, ss, sb, pnl_res, sqn
             os.mkdir(Path(f'Z:/results/{s_n}'))  # creates the folder if it doesn't
         if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}')):  # checks that the relevant folder exists
             os.mkdir(Path(f'Z:/results/{s_n}/{range_str}'))  # creates the folder if it doesn't
-        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}')):  # checks that the relevant folder exists
-            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}'))  # creates the folder if it doesn't
-        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}')):  # checks that the relevant folder exists
-            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}'))  # creates the folder if it doesn't
-        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}/pnl')):  # checks that the relevant folder exists
-            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}/pnl'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}/{rq}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}/{rq}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}/{rq}/{date_range}')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}/{rq}/{date_range}'))  # creates the folder if it doesn't
+        if not os.path.isdir(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}/{rq}/{date_range}/pnl')):  # checks that the relevant folder exists
+            os.mkdir(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}/{rq}/{date_range}/pnl'))  # creates the folder if it doesn't
 
-        np.save(Path(f'Z:/results/{s_n}/{range_str}/sl{x}-{y}-{z}/{date_range}/pnl/{trading_pair}_1m.npy'), pnl_array)  # for optimising sroc params
+        np.save(Path(f'Z:/results/{s_n}/{range_str}/{x}-{y}-{z}/{rq}/{date_range}/pnl/{trading_pair}_1m.npy'), pnl_array)  # for optimising sroc params
 
         ### find index of result with highest score
         max = np.amax(pnl_array)
         ind_max = np.argwhere(pnl_array == max)
         avg = np.mean(pnl_array)
 
-        print(f'Best PnL score: {max:.1f}, settings: {(ind_max[0][0] * a_step) + range_a[0]}, {(ind_max[0][1] * b_step) + range_b[0]}.\nMean PnL score for all settings: {avg:.2f}')
+        print(f'Best PnL score: {max:.1f}, settings: {(ind_max[0][0] * a_step) + ss[0]}, {(ind_max[0][1] * b_step) + sb[0]}.\nMean PnL score for all settings: {avg:.2f}')
 
