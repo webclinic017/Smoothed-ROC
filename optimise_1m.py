@@ -14,7 +14,6 @@ startcash = 1000
 trading_pair = 'BNBUSDT'
 strat = SmoothedRocStops
 s_n = strat.params.strat_name      # name of current strategy as a string for generating filenames etc
-run_counter = 0           # TODO implement run counter
 pnl_results = False
 sqn_results = True
 signal_or_sl = False                 # True if optimising signal params, False if optimising stoploss params
@@ -28,6 +27,7 @@ sroc = (10, 50)   # sroc range
 lb = (10, 100)    # lookback range
 ss = (1, 100)       # stop sell range
 sb = (1, 100)       # stop buy range
+size = 99
 
 r_step = ex.param_step(rq, roc[0], roc[1])
 sr_step = ex.param_step(rq, sroc[0], sroc[1])
@@ -71,22 +71,28 @@ data = btfeeds.GenericCSVData(
     compression=1
 )
 
+if signal_or_sl:
+    rt = rq**3
+else:
+    rt = rq**2
 run_counter = 0
 def cb(SmoothedRocStops):
     global run_counter
     global t_start
+    global rt
     run_counter += 1
-    if run_counter%10 == 0:
-        print(f'runs completed: {run_counter}')
+    if run_counter%100 == 0:
         t_elapsed = time.perf_counter()
         elapsed = t_elapsed - t_start
         hours = elapsed // 3600
         minutes = elapsed // 60
-        print(f'Time elapsed:{int(hours)}h {int(minutes % 60)}m')
+        print('-')
+        print(f'Runs completed: {run_counter}/{rt}, Time elapsed:{int(hours)}h {int(minutes % 60)}m')
 
 cerebro.adddata(data)
 cerebro.broker.setcash(startcash)
 cerebro.addsizer(PercentSizer)
+PercentSizer.params.percents = size
 cerebro.broker.setcommission(commission=0.00075)
 cerebro.optcallback(cb)
 
@@ -97,6 +103,8 @@ if sqn_results:
 
 
 if __name__ == '__main__':
+
+    print(f'Running {trading_pair} tests')
 
     opt_runs = cerebro.run()
 

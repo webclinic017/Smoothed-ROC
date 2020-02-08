@@ -166,8 +166,8 @@ def array_func_sl(opt_runs, s_n, trading_pair, rq, x, y, z, ss, sb, pnl_res, sqn
 
         for run in opt_runs:
             for strategy in run:
-                period1 = int(strategy.params.roc_period * rq / range_a)
-                period2 = int(strategy.params.sroc_period * rq / range_b)
+                period1 = int(strategy.params.stop_sell_perc * rq / range_a)
+                period2 = int(strategy.params.stop_buy_perc * rq / range_b)
                 pnl_value = strategy.analyzers.ta.get_analysis()['pnl']['net']['average']
                 ### store all pnl scores from backtests in a numpy array
                 pnl_array[period1][period2] = pnl_value

@@ -1,4 +1,6 @@
 import math
+from binance.client import Client
+import keys
 
 def param_step(rq, range_min, range_max):
     return math.ceil((range_max - range_min) / rq)
@@ -37,7 +39,16 @@ def printTradeAnalysis(analyzer):
     print(analyzer.pnl.net.total)
 
 
-class RunCounter:
-    def __init__(self, counter):
-        self.counter = counter
+def get_pairs(quote):
+    binance_client = Client(api_key=keys.Pkey, api_secret=keys.Skey)
+    info = binance_client.get_exchange_info()
+    symbols = info['symbols']
+    length = len(quote)
+    pairs_list = []
 
+    for item in symbols:
+        if item['symbol'][-length:] == quote:
+            if not (item['symbol'] in ['PAXUSDT', 'USDSBUSDT', 'BCHSVUSDT', 'BCHABCUSDT', 'VENUSDT', 'TUSDUSDT', 'USDCUSDT', 'USDSUSDT', 'BUSDUSDT', 'EURUSDT', 'BCCUSDT']):
+                pairs_list.append(item['symbol'])
+
+    return pairs_list

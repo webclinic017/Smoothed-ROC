@@ -1,9 +1,6 @@
 import datetime
 import backtrader as bt
 import time
-# from tqdm import tqdm
-
-run_counter = 0
 
 
 class SmoothedRoc(bt.Strategy):

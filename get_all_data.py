@@ -10,6 +10,7 @@ import time
 from dateutil import parser
 import keys
 from pathlib import Path
+import extensions as ex
 
 ### CONSTANTS
 binsizes = {"1m": 1, "5m": 5, "1h": 60, "1d": 1440}
@@ -55,31 +56,21 @@ def get_all_binance(symbol, kline_size, save = False):
     return data_df
 
 
-def get_pairs(quote):
-    info = binance_client.get_exchange_info()
-    symbols = info['symbols']
-    length = len(quote)
-    pairs_list = []
-
-    for item in symbols:
-        if item['symbol'][-length:] == quote:
-            if not (item['symbol'] in ['PAXUSDT', 'USDSBUSDT', 'BCHSVUSDT', 'BCHABCUSDT', 'VENUSDT', 'TUSDUSDT', 'USDCUSDT', 'USDSUSDT', 'BUSDUSDT', 'EURUSDT', 'BCCUSDT']):
-                pairs_list.append(item['symbol'])
-
-    return pairs_list
-
 ### RUN
 
 start = time.perf_counter()
 
-pairs = get_pairs('USDT')
-print('pairs list: ', pairs)
-for i in range(len(pairs)):
-    get_all_binance(pairs[i], '1m', save=True)
-    print(f'{i+1} of {len(pairs)} done!')
+if os.path.isdir(Path('Z:/Data')):
+    pairs = ex.get_pairs('USDT')
+    print('pairs list: ', pairs)
+    for i in range(len(pairs)):
+        get_all_binance(pairs[i], '1m', save=True)
+        print(f'{i+1} of {len(pairs)} done!')
 
-# get_all_binance('BTCUSDT', '1m', save=True)
+    # get_all_binance('BTCUSDT', '1m', save=True)
 
-end = time.perf_counter()
-total = round(end - start)
-print(f'Time taken: {total//60}m {total%60}s')
+    end = time.perf_counter()
+    total = round(end - start)
+    print(f'Time taken: {total//60}m {total%60}s')
+else:
+    print('Data folder not found, fix connection and try again')
