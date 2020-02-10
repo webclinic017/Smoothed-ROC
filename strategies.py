@@ -120,9 +120,9 @@ class SmoothedRocStops(bt.Strategy):
 
     params = (
         ('strat_name', 'smoothed-roc-stops'),
-        ('roc_period', 251),
-        ('sroc_period', 76),
-        ('lookback', 301),
+        ('roc_period', 250),
+        ('sroc_period', 75),
+        ('lookback', 300),
         ('stop_sell_perc', 50),
         ('stop_buy_perc', 50),
         ('start', 0),
@@ -134,7 +134,6 @@ class SmoothedRocStops(bt.Strategy):
         #print('%s, %s' % (dt.isoformat(), txt))
 
     def __init__(self):
-        # self.iteration_progress = tqdm(desc='Total runs', total=(self.datas[0].close.buflen()))       # possible progress bar
         self.startcash = self.broker.getvalue()
         self.dataclose = self.datas[0].close
         self.order = None
@@ -182,9 +181,6 @@ class SmoothedRocStops(bt.Strategy):
                  (trade.pnl, trade.pnlcomm))
 
     def next(self):
-        # self.iteration_progress.update()                                                              # possible progress bar
-        # self.iteration_progress.set_description(                                                      # possible progress bar
-        #     "Processing {} out of {}".format(len(self.datas[0].close), self.datas[0].close.buflen())) # possible progress bar
         self.log('Close, %.2f' % self.dataclose[0])
 
         if self.order:
@@ -203,6 +199,11 @@ class SmoothedRocStops(bt.Strategy):
                 self.log('SELL CREATE, %.2f' % self.dataclose[0])
                 self.order = self.sell()
                 self.order = self.buy(exectype=bt.Order.StopTrail, trailpercent=self.p.stop_buy_perc*0.001)
+
+
+    # TODO fixed % trailing stop does not take into account timescale. ie if the signal param periods are very short, price movements will be very small
+    # TODO and vice versa for longer param settings. so the trailing stop distance needs to take the signal timescale into account
+    # TODO this could be done by multiplying stop_buy_perc by the stdev of price movement over the past x periods (where x is the roc period)
 
         else:
 

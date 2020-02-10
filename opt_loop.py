@@ -10,9 +10,11 @@ import extensions as ex
 import results_function as rf
 from pathlib import Path
 
-def opt_loop(pair):
+pairs = ex.get_pairs('USDT')
+
+for i in pairs:
     startcash = 1000
-    trading_pair = pair
+    trading_pair = i
     strat = SmoothedRocStops
     s_n = strat.params.strat_name      # name of current strategy as a string for generating filenames etc
     pnl_results = True
@@ -22,7 +24,7 @@ def opt_loop(pair):
     end_date = datetime.datetime(2020, 1, 30)
 
     ### optimisation params
-    rq = 20           # results quantity
+    rq = 2           # results quantity
     roc = (10, 100)   # roc range
     sroc = (10, 50)   # sroc range
     lb = (10, 100)    # lookback range
@@ -55,7 +57,7 @@ def opt_loop(pair):
     else:
         cerebro.optstrategy(strat,
                             stop_sell_perc=range(ss[0], ss[1], ss_step),
-                            stop_buy_perc=range(sb[0], sb[1], sb_step),
+                            stop_buy_perc=range(sb[0], sb[1], ss_step),
                             start=t_start)
 
 
@@ -125,8 +127,3 @@ def opt_loop(pair):
         hours = t // 3600
         minutes = t // 60
         print(f'Time elapsed:{int(hours)}h {int(minutes%60)}m')
-
-pairs = ex.get_pairs('USDT')
-
-for i in pairs:
-    opt_loop(i)

@@ -11,7 +11,7 @@ import results_function as rf
 from pathlib import Path
 
 startcash = 1000
-trading_pair = 'BNBUSDT'
+trading_pair = 'BTCUSDT'
 strat = SmoothedRocStops
 s_n = strat.params.strat_name      # name of current strategy as a string for generating filenames etc
 pnl_results = False
@@ -86,8 +86,9 @@ def cb(SmoothedRocStops):
         elapsed = t_elapsed - t_start
         hours = elapsed // 3600
         minutes = elapsed // 60
-        print('-')
         print(f'Runs completed: {run_counter}/{rt}, Time elapsed:{int(hours)}h {int(minutes % 60)}m')
+        print(f'Estimated time left:{((rt/run_counter)*elapsed)//3600}h {(((rt/run_counter)*elapsed)//60) % 60}m')
+        print('-')
 
 cerebro.adddata(data)
 cerebro.broker.setcash(startcash)
@@ -123,4 +124,7 @@ if __name__ == '__main__':
     t = t_end - t_start
     hours = t // 3600
     minutes = t // 60
-    print(f'Time elapsed:{int(hours)}h {int(minutes%60)}m')
+    if int(hours) >0:
+        print(f'Time elapsed:{int(hours)}h {int(minutes%60)}m')
+    else:
+        print(f'{int(minutes)}m')

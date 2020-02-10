@@ -34,6 +34,7 @@ def get_all_binance(symbol, kline_size, save = False):
     if os.path.isfile(filename):
         data_df = pd.read_csv(filename)
     else:
+        print('no file found')
         data_df = pd.DataFrame()
     oldest_point, newest_point = minutes_of_new_data(symbol, kline_size, data_df, source="binance")
     delta_min = (newest_point - oldest_point).total_seconds()/60
