@@ -64,14 +64,20 @@ start = time.perf_counter()
 if os.path.isdir(Path('Z:/Data')):
     pairs = ex.get_pairs('USDT')
     print('pairs list: ', pairs)
-    for i in range(len(pairs)):
-        get_all_binance(pairs[i], '1m', save=True)
-        print(f'{i+1} of {len(pairs)} done!')
-
-    # get_all_binance('BTCUSDT', '1m', save=True)
-
-    end = time.perf_counter()
-    total = round(end - start)
-    print(f'Time taken: {total//60}m {total%60}s')
+    for x in ['1d', '5m', '1h', '1m']:
+        for i in range(len(pairs)):
+            get_all_binance(pairs[i], x, save=True)
+            # print(f'{i+1} of {len(pairs)} done!')
+        print('------------------------')
+        print(f'{x} data done!')
+        elapsed = round(time.perf_counter()-start)
+        print(f'Time elapsed: {elapsed//60}m {elapsed%60}s')
+        print('------------------------')
 else:
     print('Data folder not found, fix connection and try again')
+
+# get_all_binance('COTIUSDT', '5m', save=True)
+
+end = time.perf_counter()
+total = round(end - start)
+print(f'Time taken: {total//60}m {total%60}s')

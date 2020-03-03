@@ -9,7 +9,7 @@ from strategies import SmoothedRocStops
 from extensions import printTradeAnalysis
 
 startcash = 1000
-trading_pair = 'BNBUSDT'
+trading_pair = 'BTCUSDT'
 strat = SmoothedRocStops
 s_n = strat.params.strat_name
 roc = 251
