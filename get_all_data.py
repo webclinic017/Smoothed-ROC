@@ -10,7 +10,6 @@ import time
 from dateutil import parser
 import keys
 from pathlib import Path
-import extensions as ex
 
 ### CONSTANTS
 binsizes = {"1m": 1, "5m": 5, "1h": 60, "1d": 1440}
@@ -57,19 +56,32 @@ def get_all_binance(symbol, kline_size, save = False):
     return data_df
 
 
-### RUN
+def get_pairs(quote):
+    binance_client = Client(api_key=keys.Pkey, api_secret=keys.Skey)
+    info = binance_client.get_exchange_info()
+    symbols = info['symbols']
+    length = len(quote)
+    pairs_list = []
 
+    for item in symbols:
+        if item['symbol'][-length:] == quote:
+            if not (item['symbol'] in ['PAXUSDT', 'USDSBUSDT', 'BCHSVUSDT', 'BCHABCUSDT', 'VENUSDT', 'TUSDUSDT', 'USDCUSDT', 'USDSUSDT', 'BUSDUSDT', 'EURUSDT', 'BCCUSDT', 'IOTAUSDT']):
+                pairs_list.append(item['symbol'])
+
+    return pairs_list
+
+
+### RUN
 start = time.perf_counter()
 
 if os.path.isdir(Path('Z:/Data')):
-    pairs = ex.get_pairs('USDT')
+    pairs = get_pairs('USDT')
     print('pairs list: ', pairs)
-    for x in ['1d', '5m', '1h', '1m']:
-        for i in range(len(pairs)):
+    for i in range(len(pairs)):
+        for x in ['1d', '1h', '5m', '1m']:
             get_all_binance(pairs[i], x, save=True)
-            # print(f'{i+1} of {len(pairs)} done!')
         print('------------------------')
-        print(f'{x} data done!')
+        print(f'{pairs[i]} data downloaded, {i+1} of {len(pairs)} done!')
         elapsed = round(time.perf_counter()-start)
         print(f'Time elapsed: {elapsed//60}m {elapsed%60}s')
         print('------------------------')
